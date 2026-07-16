@@ -54,6 +54,29 @@ export interface ReaderSession {
   lastPage: number;
 }
 
+export interface Hold {
+  id: string;
+  status: 'WAITING' | 'OFFERED' | 'CLAIMED' | 'CANCELLED' | 'EXPIRED';
+  queuedAt: string;
+  offerExpiresAt: string | null;
+  document: DocumentItem;
+}
+
+export interface Availability {
+  licenseCount: number;
+  activeLoans: number;
+  available: boolean;
+  queueLength: number;
+  loanDurations: number[];
+  myLoan: { id: string; expiresAt: string } | null;
+  myHold: {
+    id: string;
+    status: Hold['status'];
+    position: number | null;
+    offerExpiresAt: string | null;
+  } | null;
+}
+
 export interface UserProfile {
   id: string;
   name: string;

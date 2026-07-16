@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../components/AuthContext';
-import { api, Loan } from '../../lib/api';
+import { api, Hold, Loan } from '../../lib/api';
 
 const ROLE_LABEL: Record<string, string> = {
   member: 'Anggota',
@@ -17,13 +17,23 @@ const LOAN_LABEL: Record<string, string> = {
   EXPIRED: 'Kedaluwarsa',
 };
 
+const HOLD_LABEL: Record<string, string> = {
+  WAITING: 'Mengantre',
+  OFFERED: 'Giliran tiba',
+  CLAIMED: 'Sudah diklaim',
+  CANCELLED: 'Dibatalkan',
+  EXPIRED: 'Terlewat',
+};
+
 export default function AccountPage() {
   const { user, loading } = useAuth();
   const [loans, setLoans] = useState<Loan[]>([]);
+  const [holds, setHolds] = useState<Hold[]>([]);
 
   useEffect(() => {
     if (user) {
       api.get<Loan[]>('/me/loans').then(setLoans).catch(() => undefined);
+      api.get<Hold[]>('/me/holds').then(setHolds).catch(() => undefined);
     }
   }, [user]);
 
@@ -98,6 +108,47 @@ export default function AccountPage() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {holds.filter((h) => h.status === 'WAITING' || h.status === 'OFFERED')
+        .length > 0 && (
+        <>
+          <h2 style={{ fontSize: 18, margin: '28px 0 12px' }}>Antrian Saya</h2>
+          <div className="card" style={{ overflowX: 'auto' }}>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Koleksi</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {holds
+                  .filter((h) => h.status === 'WAITING' || h.status === 'OFFERED')
+                  .map((hold) => (
+                    <tr key={hold.id}>
+                      <td>
+                        <Link href={`/katalog/${hold.document.slug}`}>
+                          {hold.document.title}
+                        </Link>
+                      </td>
+                      <td>{HOLD_LABEL[hold.status] ?? hold.status}</td>
+                      <td>
+                        <Link
+                          className="btn"
+                          style={{ padding: '5px 12px', fontSize: 13 }}
+                          href={`/katalog/${hold.document.slug}`}
+                        >
+                          {hold.status === 'OFFERED' ? 'Klaim' : 'Lihat'}
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

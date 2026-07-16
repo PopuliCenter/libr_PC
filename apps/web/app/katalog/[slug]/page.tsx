@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../../components/AuthContext';
-import { api, DocumentItem, Loan } from '../../../lib/api';
+import { api, Availability, DocumentItem } from '../../../lib/api';
 
 const ACCESS_INFO: Record<string, string> = {
   OPEN: 'Koleksi terbuka — dapat dibaca semua anggota setelah masuk.',
@@ -16,21 +16,19 @@ export default function DocumentDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const { user } = useAuth();
   const [doc, setDoc] = useState<DocumentItem | null>(null);
-  const [activeLoan, setActiveLoan] = useState<Loan | null>(null);
+  const [avail, setAvail] = useState<Availability | null>(null);
   const [duration, setDuration] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<{ kind: string; text: string } | null>(null);
   const [error, setError] = useState('');
 
-  const refreshLoan = useCallback(
+  const refreshAvail = useCallback(
     async (docId: string) => {
       if (!user) return;
       try {
-        const loans = await api.get<Loan[]>('/me/loans');
-        setActiveLoan(
-          loans.find((l) => l.status === 'ACTIVE' && l.document.id === docId) ??
-            null,
-        );
+        const a = await api.get<Availability>(`/documents/${docId}/availability`);
+        setAvail(a);
+        setDuration((d) => d ?? a.loanDurations?.[0] ?? null);
       } catch {
         /* abaikan */
       }
@@ -43,34 +41,22 @@ export default function DocumentDetailPage() {
       .get<DocumentItem>(`/documents/${slug}`)
       .then((d) => {
         setDoc(d);
-        setDuration(d.loanDurations?.[0] ?? null);
-        refreshLoan(d.id);
+        if (d.accessType === 'LOAN') refreshAvail(d.id);
       })
       .catch((err) => setError((err as Error).message));
-  }, [slug, refreshLoan]);
+  }, [slug, refreshAvail]);
 
-  async function borrow() {
-    if (!doc || !duration) return;
+  async function action(
+    fn: () => Promise<unknown>,
+    successText: string,
+  ) {
+    if (!doc) return;
     setBusy(true);
     setNotice(null);
     try {
-      await api.post('/loans', { documentId: doc.id, durationDays: duration });
-      setNotice({ kind: 'success', text: 'Berhasil dipinjam. Selamat membaca!' });
-      await refreshLoan(doc.id);
-    } catch (err) {
-      setNotice({ kind: 'error', text: (err as Error).message });
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function returnLoan() {
-    if (!activeLoan) return;
-    setBusy(true);
-    try {
-      await api.post(`/loans/${activeLoan.id}/return`);
-      setActiveLoan(null);
-      setNotice({ kind: 'success', text: 'Koleksi dikembalikan. Terima kasih!' });
+      await fn();
+      setNotice({ kind: 'success', text: successText });
+      await refreshAvail(doc.id);
     } catch (err) {
       setNotice({ kind: 'error', text: (err as Error).message });
     } finally {
@@ -128,43 +114,54 @@ export default function DocumentDetailPage() {
           <Link className="btn" href="/masuk">Masuk untuk membaca</Link>
         )}
 
-        {doc.hasDigitalCopy && user && (
-          <>
-            {(doc.accessType !== 'LOAN' || isStaff) && (
-              <Link className="btn" href={`/baca/${doc.slug}`}>📖 Baca Online</Link>
-            )}
-
-            {doc.accessType === 'LOAN' && !isStaff && (
-              activeLoan ? (
-                <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <Link className="btn" href={`/baca/${doc.slug}`}>📖 Baca Online</Link>
-                  <button className="btn secondary" onClick={returnLoan} disabled={busy}>
-                    Kembalikan
-                  </button>
-                  <span style={{ fontSize: 13, color: 'var(--ink-soft)' }}>
-                    Jatuh tempo:{' '}
-                    {new Date(activeLoan.expiresAt).toLocaleString('id-ID')}
-                  </span>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <select
-                    value={duration ?? ''}
-                    onChange={(e) => setDuration(Number(e.target.value))}
-                    style={{ padding: '9px 12px', borderRadius: 10, border: '1px solid var(--line)' }}
-                  >
-                    {(doc.loanDurations ?? []).map((d) => (
-                      <option key={d} value={d}>{d} hari</option>
-                    ))}
-                  </select>
-                  <button className="btn" onClick={borrow} disabled={busy || !duration}>
-                    {busy ? 'Memproses…' : 'Pinjam'}
-                  </button>
-                </div>
-              )
-            )}
-          </>
+        {doc.hasDigitalCopy && user && doc.accessType !== 'LOAN' && (
+          <Link className="btn" href={`/baca/${doc.slug}`}>📖 Baca Online</Link>
         )}
+
+        {doc.hasDigitalCopy && user && doc.accessType === 'LOAN' && isStaff && (
+          <Link className="btn" href={`/baca/${doc.slug}`}>📖 Baca Online (staf)</Link>
+        )}
+
+        {doc.hasDigitalCopy && user && doc.accessType === 'LOAN' && !isStaff &&
+          avail && (
+            <LoanActions
+              avail={avail}
+              slug={doc.slug}
+              duration={duration}
+              setDuration={setDuration}
+              busy={busy}
+              onBorrow={(d) =>
+                action(
+                  () => api.post('/loans', { documentId: doc.id, durationDays: d }),
+                  'Berhasil dipinjam. Selamat membaca!',
+                )
+              }
+              onReturn={(loanId) =>
+                action(
+                  () => api.post(`/loans/${loanId}/return`),
+                  'Koleksi dikembalikan. Terima kasih!',
+                )
+              }
+              onJoin={() =>
+                action(
+                  () => api.post('/holds', { documentId: doc.id }),
+                  'Anda masuk antrian. Kami kabari via email saat giliran tiba.',
+                )
+              }
+              onClaim={(holdId, d) =>
+                action(
+                  () => api.post(`/holds/${holdId}/claim`, { durationDays: d }),
+                  'Berhasil diklaim. Selamat membaca!',
+                )
+              }
+              onCancelHold={(holdId) =>
+                action(
+                  () => api.post(`/holds/${holdId}/cancel`),
+                  'Antrian dibatalkan.',
+                )
+              }
+            />
+          )}
       </div>
 
       {doc.abstract && (
@@ -203,6 +200,130 @@ export default function DocumentDetailPage() {
           </dd>
         </dl>
       </section>
+    </div>
+  );
+}
+
+function LoanActions({
+  avail,
+  slug,
+  duration,
+  setDuration,
+  busy,
+  onBorrow,
+  onReturn,
+  onJoin,
+  onClaim,
+  onCancelHold,
+}: {
+  avail: Availability;
+  slug: string;
+  duration: number | null;
+  setDuration: (d: number) => void;
+  busy: boolean;
+  onBorrow: (d: number) => void;
+  onReturn: (loanId: string) => void;
+  onJoin: () => void;
+  onClaim: (holdId: string, d: number) => void;
+  onCancelHold: (holdId: string) => void;
+}) {
+  const row: React.CSSProperties = {
+    display: 'flex',
+    gap: 10,
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  };
+  const durationSelect = (
+    <select
+      value={duration ?? ''}
+      onChange={(e) => setDuration(Number(e.target.value))}
+      style={{ padding: '9px 12px', borderRadius: 10, border: '1px solid var(--line)' }}
+    >
+      {avail.loanDurations.map((d) => (
+        <option key={d} value={d}>{d} hari</option>
+      ))}
+    </select>
+  );
+
+  // Sedang meminjam.
+  if (avail.myLoan) {
+    return (
+      <div style={row}>
+        <Link className="btn" href={`/baca/${slug}`}>📖 Baca Online</Link>
+        <button className="btn secondary" onClick={() => onReturn(avail.myLoan!.id)} disabled={busy}>
+          Kembalikan
+        </button>
+        <span style={{ fontSize: 13, color: 'var(--ink-soft)' }}>
+          Jatuh tempo: {new Date(avail.myLoan.expiresAt).toLocaleString('id-ID')}
+        </span>
+      </div>
+    );
+  }
+
+  // Giliran tiba — tawaran menunggu diklaim.
+  if (avail.myHold?.status === 'OFFERED') {
+    return (
+      <div>
+        <div className="alert success" style={{ marginBottom: 12 }}>
+          🎉 Giliran Anda tiba! Klaim sebelum{' '}
+          {avail.myHold.offerExpiresAt &&
+            new Date(avail.myHold.offerExpiresAt).toLocaleString('id-ID')}
+          , setelah itu giliran berpindah.
+        </div>
+        <div style={row}>
+          {durationSelect}
+          <button className="btn" onClick={() => onClaim(avail.myHold!.id, duration!)} disabled={busy || !duration}>
+            {busy ? 'Memproses…' : 'Klaim & Pinjam'}
+          </button>
+          <button className="btn secondary" onClick={() => onCancelHold(avail.myHold!.id)} disabled={busy}>
+            Lewati
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Dalam antrian.
+  if (avail.myHold?.status === 'WAITING') {
+    return (
+      <div style={row}>
+        <span className="badge loan">Dalam antrian</span>
+        <span style={{ fontSize: 14 }}>
+          Posisi Anda: <strong>{avail.myHold.position}</strong> dari{' '}
+          {avail.queueLength} pengantre
+        </span>
+        <button className="btn secondary" onClick={() => onCancelHold(avail.myHold!.id)} disabled={busy}>
+          Batalkan antrian
+        </button>
+      </div>
+    );
+  }
+
+  // Tersedia untuk dipinjam.
+  if (avail.available) {
+    return (
+      <div style={row}>
+        {durationSelect}
+        <button className="btn" onClick={() => onBorrow(duration!)} disabled={busy || !duration}>
+          {busy ? 'Memproses…' : 'Pinjam'}
+        </button>
+        <span style={{ fontSize: 13, color: 'var(--ink-soft)' }}>
+          {avail.licenseCount - avail.activeLoans} dari {avail.licenseCount} kopi tersedia
+        </span>
+      </div>
+    );
+  }
+
+  // Penuh — tawarkan antrian.
+  return (
+    <div style={row}>
+      <span style={{ fontSize: 14, color: 'var(--ink-soft)' }}>
+        Semua {avail.licenseCount} kopi sedang dipinjam
+        {avail.queueLength > 0 ? ` · ${avail.queueLength} orang mengantre` : ''}.
+      </span>
+      <button className="btn" onClick={onJoin} disabled={busy}>
+        {busy ? 'Memproses…' : 'Masuk Antrian'}
+      </button>
     </div>
   );
 }

@@ -9,10 +9,15 @@ import {
 import { DATETIME } from '../../../database/column-types';
 import { Document } from '../../catalog/entities/document.entity';
 
-export type LoanStatus = 'ACTIVE' | 'RETURNED' | 'EXPIRED';
+export type HoldStatus =
+  | 'WAITING' // dalam antrian
+  | 'OFFERED' // giliran tiba, menunggu diklaim (jendela 24 jam)
+  | 'CLAIMED' // sudah dipinjam
+  | 'CANCELLED' // dibatalkan anggota
+  | 'EXPIRED'; // tawaran lewat tanpa diklaim
 
-@Entity('loans')
-export class Loan {
+@Entity('holds')
+export class Hold {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -24,23 +29,15 @@ export class Loan {
   document: Document;
 
   @Index()
-  @Column({ type: 'varchar', default: 'ACTIVE' })
-  status: LoanStatus;
-
-  @Column({ type: 'int' })
-  durationDays: number;
+  @Column({ type: 'varchar', default: 'WAITING' })
+  status: HoldStatus;
 
   @CreateDateColumn()
-  borrowedAt: Date;
-
-  @Index()
-  @Column({ type: DATETIME })
-  expiresAt: Date;
+  queuedAt: Date;
 
   @Column({ type: DATETIME, nullable: true })
-  returnedAt: Date | null;
+  offeredAt: Date | null;
 
-  /** Ditandai saat pengingat H-1 jatuh tempo terkirim (cegah kirim ganda). */
   @Column({ type: DATETIME, nullable: true })
-  expiringNotifiedAt: Date | null;
+  offerExpiresAt: Date | null;
 }

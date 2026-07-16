@@ -43,6 +43,8 @@ src/
 | `POST/PATCH/DELETE /admin/documents` | librarian+ | CRUD koleksi (ter-audit) |
 | `GET /admin/audit-logs` | superadmin | Query audit log |
 | `POST /loans` · `POST /loans/:id/return` · `GET /me/loans` | member | Sewa digital: kuota lisensi per koleksi, batas 3 pinjaman aktif, kedaluwarsa otomatis (lazy check + cron per menit) |
+| `GET /documents/:id/availability` | member | Ketersediaan + posisi antrian user (dipakai UI menentukan Pinjam/Antre/Klaim/Baca) |
+| `POST /holds` · `POST /holds/:id/claim` · `POST /holds/:id/cancel` · `GET /me/holds` | member | Antrian FIFO saat lisensi penuh; tawaran jendela klaim 24 jam (cron per menit) |
 | `POST /reader/sessions` → `GET /reader/sessions/:id/pages/:n` | member | Protected reader: halaman dirender server-side (MuPDF) ber-watermark identitas; `no-store`; tipe LOAN wajib pinjaman aktif |
 | `POST /admin/documents/:id/upload` | librarian+ | Upload PDF master (multipart `file`, validasi magic bytes, hitung halaman) |
 | `GET /oai?verb=Identify` dll. | publik | OAI-PMH: Identify, ListMetadataFormats, ListIdentifiers, ListRecords, GetRecord (oai_dc) |
