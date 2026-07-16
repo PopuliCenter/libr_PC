@@ -50,6 +50,11 @@ src/
 | `GET /admin/import/template` | librarian+ | Unduh template Excel (sheet Koleksi + Petunjuk) |
 | `POST /admin/import/batches` (ZIP) → `POST .../:id/commit` | librarian+ | Impor massal: unggah ZIP (template+PDF) → validasi pra-impor → impor background (buat koleksi, master PDF, hitung halaman, idempoten via checksum) |
 | `GET /admin/import/batches/:id` · `.../:id/report` | librarian+ | Pantau status per item + unduh laporan xlsx |
+| `GET /admin/isbn/:isbn` | librarian+ | Lookup metadata ISBN (cache → Google Books → Open Library) |
+| `POST /admin/physical-items` · `GET /admin/physical-items` | librarian+ | Data eksemplar fisik (nomor induk PC-YYYY-NNNNN otomatis, multi-eksemplar per judul) |
+| `POST /admin/labels` | librarian+ | Lembar stiker label QR (PDF) untuk daftar nomor induk |
+| `POST /admin/stocktakes` → `.../:id/scan` → `.../:id/close` · `.../:id/report` | librarian+ | Stock opname: scan idempoten (offline-tolerant), hitung hilang/salah lokasi, laporan xlsx |
+| `GET /admin/inventory/report` | librarian+ | Rekap inventaris (xlsx) |
 | `GET /oai?verb=Identify` dll. | publik | OAI-PMH: Identify, ListMetadataFormats, ListIdentifiers, ListRecords, GetRecord (oai_dc) |
 | `POST /chat/messages` | publik (rate-limited) | Chat bantuan; `GET /chat/sessions/:id/messages` untuk riwayat |
 

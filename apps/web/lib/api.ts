@@ -62,6 +62,61 @@ export interface Hold {
   document: DocumentItem;
 }
 
+export interface IsbnLookup {
+  isbn: string;
+  found: boolean;
+  source: string;
+  metadata: {
+    title: string;
+    authors: string[];
+    publisher: string | null;
+    year: number | null;
+    coverUrl: string | null;
+  } | null;
+}
+
+export interface PhysicalItem {
+  id: string;
+  accessionNo: string;
+  barcode: string | null;
+  shelfLocation: string | null;
+  condition: string;
+  acquisitionSource: string | null;
+  document: DocumentItem;
+}
+
+export interface Stocktake {
+  id: string;
+  name: string;
+  status: 'OPEN' | 'CLOSED';
+  startedAt: string;
+  closedAt: string | null;
+  summary: {
+    totalItems: number;
+    found: number;
+    missing: number;
+    misplaced: number;
+    unknownScans: number;
+  } | null;
+}
+
+export interface StocktakeDetail {
+  stocktake: Stocktake;
+  scanCount: number;
+  recentScans: {
+    id: string;
+    barcode: string;
+    physicalItemId: string | null;
+    scannedLocation: string | null;
+  }[];
+  live: {
+    totalItems: number;
+    found: number;
+    remaining: number;
+    unknownScans: number;
+  };
+}
+
 export interface ImportBatch {
   id: string;
   filename: string;

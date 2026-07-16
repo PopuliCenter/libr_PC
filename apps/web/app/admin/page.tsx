@@ -100,7 +100,10 @@ export default function AdminPage() {
           <h1 className="page-title">Manajemen Koleksi</h1>
           <p className="page-sub">Tambah dan kelola koleksi perpustakaan.</p>
         </div>
-        <Link href="/admin/impor" className="btn">📦 Impor Massal</Link>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <Link href="/admin/inventaris" className="btn secondary">📷 Inventaris Fisik</Link>
+          <Link href="/admin/impor" className="btn">📦 Impor Massal</Link>
+        </div>
       </div>
 
       {notice && <div className={`alert ${notice.kind}`}>{notice.text}</div>}

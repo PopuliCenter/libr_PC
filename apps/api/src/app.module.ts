@@ -19,6 +19,7 @@ import { LoansModule } from './modules/loans/loans.module';
 import { HoldsModule } from './modules/holds/holds.module';
 import { ReaderModule } from './modules/reader/reader.module';
 import { ImportModule } from './modules/import/import.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
@@ -36,6 +37,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     HoldsModule,
     ReaderModule,
     ImportModule,
+    InventoryModule,
     NotificationsModule,
     OaiModule,
     ChatModule,
