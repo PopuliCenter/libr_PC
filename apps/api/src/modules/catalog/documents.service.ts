@@ -107,11 +107,34 @@ export class DocumentsService {
     id: string,
     masterObjectKey: string,
     pageCount: number,
+    checksum?: string,
   ): Promise<Document> {
     const doc = await this.findById(id);
     doc.masterObjectKey = masterObjectKey;
     doc.pageCount = pageCount;
+    if (checksum) doc.sourceChecksum = checksum;
     return this.repo.save(doc);
+  }
+
+  /** Cek duplikat kandidat impor: PDF identik, ISBN sama, atau judul+tahun sama. */
+  async findDuplicate(
+    isbn: string | null,
+    title: string,
+    year: number | null,
+  ): Promise<Document | null> {
+    if (isbn) {
+      const byIsbn = await this.repo.findOne({ where: { isbnIssn: isbn } });
+      if (byIsbn) return byIsbn;
+    }
+    return this.repo
+      .createQueryBuilder('doc')
+      .where('LOWER(doc.title) = :title', { title: title.toLowerCase() })
+      .andWhere(year === null ? 'doc.year IS NULL' : 'doc.year = :year', { year })
+      .getOne();
+  }
+
+  findByChecksum(checksum: string): Promise<Document | null> {
+    return this.repo.findOne({ where: { sourceChecksum: checksum } });
   }
 
   async remove(id: string): Promise<void> {

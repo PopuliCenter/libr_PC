@@ -62,6 +62,44 @@ export interface Hold {
   document: DocumentItem;
 }
 
+export interface ImportBatch {
+  id: string;
+  filename: string;
+  status: 'VALIDATING' | 'READY' | 'PROCESSING' | 'DONE' | 'FAILED';
+  totals: {
+    total: number;
+    valid: number;
+    warning: number;
+    error: number;
+    created: number;
+    skipped: number;
+    failedItems: number;
+  } | null;
+  autoPublish: boolean;
+  createdAt: string;
+}
+
+export interface ImportItem {
+  id: string;
+  rowNo: number;
+  status:
+    | 'VALID'
+    | 'WARNING'
+    | 'ERROR'
+    | 'PROCESSING'
+    | 'CREATED'
+    | 'SKIPPED'
+    | 'FAILED';
+  messages: string[];
+  documentId: string | null;
+  payload: {
+    namaFile: string;
+    judul: string;
+    tipeAkses: string;
+    kategori: string;
+  };
+}
+
 export interface Availability {
   licenseCount: number;
   activeLoans: number;
@@ -180,6 +218,47 @@ export async function apiBlob(path: string): Promise<Blob> {
     throw new ApiError(res.status, message);
   }
   return res.blob();
+}
+
+/** Unduh berkas terproteksi (butuh Authorization) lalu picu unduhan browser. */
+export async function apiDownload(path: string, filename: string): Promise<void> {
+  const tokens = getTokens();
+  const res = await fetch(`${API_URL}${path}`, {
+    headers: tokens ? { Authorization: `Bearer ${tokens.accessToken}` } : {},
+  });
+  if (!res.ok) throw new ApiError(res.status, `Gagal mengunduh (${res.status})`);
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/** Upload multipart (mis. ZIP impor). */
+export async function apiUpload<T>(path: string, file: File): Promise<T> {
+  const tokens = getTokens();
+  const form = new FormData();
+  form.append('file', file);
+  const res = await fetch(`${API_URL}${path}`, {
+    method: 'POST',
+    headers: tokens ? { Authorization: `Bearer ${tokens.accessToken}` } : {},
+    body: form,
+  });
+  if (!res.ok) {
+    let message = `Gagal mengunggah (${res.status})`;
+    try {
+      const body = await res.json();
+      message = Array.isArray(body.message)
+        ? body.message.join(', ')
+        : (body.message ?? message);
+    } catch {
+      /* bukan JSON */
+    }
+    throw new ApiError(res.status, message);
+  }
+  return res.json();
 }
 
 export const api = {

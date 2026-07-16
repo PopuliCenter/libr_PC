@@ -42,6 +42,18 @@ export class CategoriesService {
     );
   }
 
+  /** Cari kategori berdasarkan nama (case-insensitive), buat bila belum ada. */
+  async findOrCreate(name: string): Promise<Category> {
+    const slug = name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-');
+    const existing = await this.repo.findOne({ where: { slug } });
+    if (existing) return existing;
+    return this.repo.save(this.repo.create({ name, slug, parent: null }));
+  }
+
   async remove(id: string): Promise<void> {
     await this.repo.remove(await this.findById(id));
   }

@@ -18,5 +18,6 @@ import { ReaderService } from './reader.service';
   ],
   controllers: [ReaderController, AdminUploadController],
   providers: [ReaderService, PdfRenderService],
+  exports: [PdfRenderService],
 })
 export class ReaderModule {}

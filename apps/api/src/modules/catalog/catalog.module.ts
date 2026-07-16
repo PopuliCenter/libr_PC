@@ -16,6 +16,6 @@ import { Document } from './entities/document.entity';
     CategoriesController,
   ],
   providers: [DocumentsService, CategoriesService],
-  exports: [DocumentsService],
+  exports: [DocumentsService, CategoriesService],
 })
 export class CatalogModule {}

@@ -95,11 +95,13 @@ export default function AdminPage() {
 
   return (
     <div className="container page">
-      <h1 className="page-title">Manajemen Koleksi</h1>
-      <p className="page-sub">
-        Tambah dan kelola koleksi. Impor massal & upload PDF menyusul di modul
-        berikutnya.
-      </p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+        <div>
+          <h1 className="page-title">Manajemen Koleksi</h1>
+          <p className="page-sub">Tambah dan kelola koleksi perpustakaan.</p>
+        </div>
+        <Link href="/admin/impor" className="btn">📦 Impor Massal</Link>
+      </div>
 
       {notice && <div className={`alert ${notice.kind}`}>{notice.text}</div>}
 

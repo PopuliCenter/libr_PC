@@ -98,6 +98,11 @@ export class Document {
   @Column({ type: 'varchar', nullable: true })
   coverObjectKey: string | null;
 
+  /** SHA-256 file PDF master — untuk deteksi impor ganda (idempotensi). */
+  @Index()
+  @Column({ type: 'varchar', nullable: true })
+  sourceChecksum: string | null;
+
   @CreateDateColumn()
   createdAt: Date;
 
