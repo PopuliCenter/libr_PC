@@ -230,6 +230,21 @@ table.admin-table th { font-size: 12px; text-transform: uppercase; letter-spacin
   border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin-bottom: 12px;
 }
 
+/* ===== Pemilih minat (segmentasi) ===== */
+.interest-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.interest-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px;
+  font-size: 13px; cursor: pointer; user-select: none; background: var(--surface);
+}
+.interest-chip.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-strong); }
+.interest-chip input { accent-color: var(--accent); }
+.consent-row {
+  display: flex; gap: 10px; align-items: flex-start; margin-top: 14px;
+  font-size: 13px; color: var(--ink-soft); cursor: pointer;
+}
+.consent-row input { margin-top: 3px; accent-color: var(--accent); }
+
 /* ===== Widget chat ===== */
 .chat-fab {
   position: fixed; right: 22px; bottom: 22px; z-index: 90;

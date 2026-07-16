@@ -42,6 +42,17 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   googleId: string | null;
 
+  /** Slug kategori yang diminati anggota (segmentasi diseminasi — PRD I6). */
+  @Column({ type: 'simple-json', default: '[]' })
+  interests: string[];
+
+  /** Persetujuan menerima notifikasi terbitan baru (non-transaksional, UU PDP). */
+  @Column({ type: 'boolean', default: false })
+  newsletterConsent: boolean;
+
+  @Column({ type: DATETIME, nullable: true })
+  newsletterConsentAt: Date | null;
+
   @Column({ type: DATETIME, nullable: true })
   emailVerifiedAt: Date | null;
 

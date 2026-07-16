@@ -41,6 +41,9 @@ export class AuthService {
       institution: dto.institution ?? null,
       passwordHash: await argon2.hash(dto.password),
       status: 'pending',
+      interests: dto.interests ?? [],
+      newsletterConsent: dto.newsletterConsent ?? false,
+      newsletterConsentAt: dto.newsletterConsent ? new Date() : null,
       verificationTokenHash: this.hashToken(token),
       verificationTokenExpiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
@@ -145,6 +148,36 @@ export class AuthService {
       throw new UnauthorizedException('Akun diblokir. Hubungi pustakawan.');
     }
     return this.issueTokens(user);
+  }
+
+  /** Anggota memperbarui minat / consent newsletter / nomor telepon. */
+  async updatePreferences(
+    userId: string,
+    input: {
+      interests?: string[];
+      newsletterConsent?: boolean;
+      phone?: string;
+    },
+  ): Promise<User> {
+    const user = await this.usersService.findById(userId);
+    if (!user) throw new UnauthorizedException('Akun tidak aktif');
+
+    const patch: Partial<User> = {};
+    if (input.interests !== undefined) {
+      patch.interests = [...new Set(input.interests.map((s) => s.trim()).filter(Boolean))];
+    }
+    if (input.phone !== undefined) {
+      patch.phone = input.phone.trim() || null;
+    }
+    if (input.newsletterConsent !== undefined) {
+      patch.newsletterConsent = input.newsletterConsent;
+      // Catat momen consent berubah menjadi true (jejak persetujuan UU PDP).
+      if (input.newsletterConsent && !user.newsletterConsent) {
+        patch.newsletterConsentAt = new Date();
+      }
+      if (!input.newsletterConsent) patch.newsletterConsentAt = null;
+    }
+    return this.usersService.update(userId, patch);
   }
 
   private async issueTokens(user: User): Promise<TokenPair> {

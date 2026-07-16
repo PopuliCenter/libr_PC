@@ -182,6 +182,9 @@ export interface UserProfile {
   role: 'member' | 'librarian' | 'superadmin';
   status: string;
   institution: string | null;
+  phone: string | null;
+  interests: string[];
+  newsletterConsent: boolean;
 }
 
 // ===== Penyimpanan token =====

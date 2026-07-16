@@ -22,6 +22,23 @@ export class UsersService {
     return this.repo.findOne({ where: { googleId } });
   }
 
+  /**
+   * Anggota aktif yang setuju newsletter dan minatnya beririsan dengan `topics`.
+   * `interests` disimpan sebagai JSON teks (portabel SQLite/PostgreSQL), maka
+   * irisan dihitung di aplikasi. Skala Fase 1 kecil; bila membesar, pindah ke
+   * kolom relasional/GIN index + query set.
+   */
+  async findNewsletterRecipients(topics: string[]): Promise<User[]> {
+    if (topics.length === 0) return [];
+    const wanted = new Set(topics);
+    const candidates = await this.repo.find({
+      where: { newsletterConsent: true, status: 'active' },
+    });
+    return candidates.filter((u) =>
+      (u.interests ?? []).some((i) => wanted.has(i)),
+    );
+  }
+
   create(data: Partial<User>): Promise<User> {
     const user = this.repo.create({
       ...data,

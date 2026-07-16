@@ -1,11 +1,27 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
+import {
+  DOCUMENT_PUBLISHED,
+  DocumentPublishedEvent,
+} from '../notifications/events';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { QueryDocumentsDto } from './dto/query-documents.dto';
 import { UpdateDocumentDto } from './dto/update-document.dto';
 import { CategoriesService } from './categories.service';
 import { Document } from './entities/document.entity';
+
+/** Slugify sederhana (dipakai juga untuk mencocokkan subjek ke minat kategori). */
+export function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .slice(0, 80);
+}
 
 export interface PagedResult<T> {
   data: T[];
@@ -18,6 +34,7 @@ export class DocumentsService {
     @InjectRepository(Document)
     private readonly repo: Repository<Document>,
     private readonly categoriesService: CategoriesService,
+    private readonly events: EventEmitter2,
   ) {}
 
   /** Pencarian katalog publik — hanya koleksi PUBLISHED. */
@@ -87,7 +104,8 @@ export class DocumentsService {
         ? await this.categoriesService.findById(categoryId)
         : null,
     });
-    return this.repo.save(doc);
+    const saved = await this.repo.save(doc);
+    return this.announceIfNewlyPublished(saved);
   }
 
   async update(id: string, dto: UpdateDocumentDto): Promise<Document> {
@@ -99,7 +117,33 @@ export class DocumentsService {
         ? await this.categoriesService.findById(categoryId)
         : null;
     }
-    return this.repo.save(doc);
+    const saved = await this.repo.save(doc);
+    return this.announceIfNewlyPublished(saved);
+  }
+
+  /**
+   * Bila koleksi baru saja PUBLISHED dan belum pernah diumumkan, tandai
+   * `announcedAt` (sekali seumur hidup → tak ada notifikasi ganda) lalu pancarkan
+   * event agar anggota yang minatnya cocok diberi tahu.
+   */
+  private async announceIfNewlyPublished(doc: Document): Promise<Document> {
+    if (doc.status !== 'PUBLISHED' || doc.announcedAt) return doc;
+    doc.announcedAt = new Date();
+    const saved = await this.repo.save(doc);
+    this.events.emit(
+      DOCUMENT_PUBLISHED,
+      new DocumentPublishedEvent(saved.id, saved.title, saved.slug, this.topicsOf(saved)),
+    );
+    return saved;
+  }
+
+  /** Topik koleksi untuk pencocokan minat: slug kategori + subjek ter-slug. */
+  private topicsOf(doc: Document): string[] {
+    const topics = [
+      doc.category?.slug,
+      ...(doc.subjects ?? []).map(slugify),
+    ].filter((t): t is string => Boolean(t));
+    return [...new Set(topics)];
   }
 
   /** Dipanggil setelah upload PDF master berhasil. */

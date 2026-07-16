@@ -5,6 +5,8 @@ import { MailService } from '../mail/mail.service';
 import { UsersService } from '../users/users.service';
 import { WhatsappService } from '../whatsapp/whatsapp.service';
 import {
+  DOCUMENT_PUBLISHED,
+  DocumentPublishedEvent,
   HOLD_OFFERED,
   HoldOfferedEvent,
   LOAN_CREATED,
@@ -71,6 +73,41 @@ export class NotificationsListener {
       (phone) =>
         this.whatsapp.holdOffered(phone, e.documentTitle, claimUrl, e.offerExpiresAt),
     );
+  }
+
+  /**
+   * Terbitan baru → notifikasi tersegmentasi ke anggota yang (a) menyetujui
+   * newsletter dan (b) minatnya cocok dengan topik koleksi (UU PDP). Tiap
+   * anggota & channel di-try/catch terpisah agar satu kegagalan tak menghentikan
+   * pengiriman ke yang lain.
+   */
+  @OnEvent(DOCUMENT_PUBLISHED)
+  async onDocumentPublished(e: DocumentPublishedEvent): Promise<void> {
+    const recipients = await this.users
+      .findNewsletterRecipients(e.topics)
+      .catch(() => []);
+    if (recipients.length === 0) return;
+
+    const webUrl = this.config.get('WEB_URL', 'http://localhost:3000');
+    const url = `${webUrl}/katalog/${e.slug}`;
+    this.logger.log(
+      `Terbitan baru "${e.title}" → ${recipients.length} anggota tersegmentasi.`,
+    );
+
+    for (const user of recipients) {
+      try {
+        await this.mail.sendNewPublication(user.email, e.title, url);
+      } catch (err) {
+        this.logger.error(`Newsletter email gagal: ${(err as Error).message}`);
+      }
+      if (user.phone && this.whatsapp.enabled) {
+        try {
+          await this.whatsapp.newPublication(user.phone, e.title, url);
+        } catch (err) {
+          this.logger.error(`Newsletter WA gagal: ${(err as Error).message}`);
+        }
+      }
+    }
   }
 
   /**

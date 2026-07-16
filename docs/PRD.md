@@ -241,7 +241,7 @@ Arah besar: perpustakaan ini bukan sistem yang berdiri sendiri, melainkan **pint
 | I3 | **Widget & API untuk website utama** — blok "Publikasi Terbaru" di populicenter.org otomatis menarik dari katalog; tautan "Baca di e-Library" | Satu sumber kebenaran; tak ada upload dobel ke website & library | API publik read-only `GET /documents` (sudah ada) + embeddable widget/RSS |
 | I4 | **Tautan acara & multimedia** — record publikasi memuat tautan peluncuran/diskusi (YouTube, podcast); sebaliknya halaman acara menaut ke publikasi | Konteks lengkap: baca laporannya, tonton diskusinya | Field `related_links JSONB` per dokumen; tipe koleksi `video/audio` (metadata + embed, tanpa DRM) |
 | I5 ✅ | **Notifikasi WhatsApp** — pengingat jatuh tempo sewa, giliran antrian, terbitan baru sesuai minat | Email sering tak terbaca di Indonesia; WA jauh lebih efektif | **Terimplementasi** (pengingat sewa & antrian): channel WA berdampingan dengan email di `NotificationsListener`; modul `whatsapp/` provider-agnostik (log/Fonnte/Meta Cloud API), normalisasi nomor, degradasi anggun. "Terbitan baru sesuai minat" menyusul dgn I6 (segmentasi). |
-| I6 | **Newsletter & segmentasi minat** — saat daftar, anggota memilih topik minat (politik, ekonomi, pemilu…); terbitan baru memicu email/WA ke segmen terkait (dengan consent UU PDP) | Diseminasi aktif, bukan menunggu dikunjungi | Field `interests[]` pada user + integrasi Mailchimp/listmonk |
+| I6 ✅ | **Newsletter & segmentasi minat** — saat daftar, anggota memilih topik minat (politik, ekonomi, pemilu…); terbitan baru memicu email/WA ke segmen terkait (dengan consent UU PDP) | Diseminasi aktif, bukan menunggu dikunjungi | **Terimplementasi**: `interests[]` (slug kategori) + `newsletterConsent` pada user; event `document.published` → notifikasi tersegmentasi (email+WA) ke anggota yang minatnya cocok & consent; `announcedAt` idempoten; UI pilih minat di daftar & akun. Integrasi ESP eksternal (Mailchimp/listmonk) opsional menyusul. |
 | I7 | **Analitik diseminasi** — dasbor: publikasi mana paling dibaca, oleh segmen mana (institusi, wilayah), tren topik | Bahan laporan dampak ke funder & manajemen | Data `reading_events` Fase 1 sudah mencatat semuanya; tinggal lapisan dasbor (Metabase) |
 
 ### 9.2 Integrasi jejaring perpustakaan & akademik
@@ -266,6 +266,6 @@ Arah besar: perpustakaan ini bukan sistem yang berdiri sendiri, melainkan **pint
 ### 9.4 Urutan yang disarankan
 
 1. **Cepat & murah, kerjakan dulu (bersamaan akhir Fase 1b):** ~~I9 (sitasi)~~ **✅ selesai**, I3 (widget website), I4 (tautan acara).
-2. **Gelombang integrasi pertama (Fase 2):** ~~I5 (WhatsApp)~~ **✅ selesai**, I6 (segmentasi minat), I8 (OneSearch — sudah ada OAI-PMH), P1 (koleksi internal).
+2. **Gelombang integrasi pertama (Fase 2):** ~~I5 (WhatsApp)~~ **✅**, ~~I6 (segmentasi minat)~~ **✅**, ~~I8 (OneSearch)~~ **✅ (OAI-PMH)**, P1 (koleksi internal).
 3. **Strategis (Fase 2–3):** ~~I1 (SSO)~~ **✅ selesai** — perpustakaan sudah jadi OIDC Provider; aplikasi survei tinggal didaftarkan sebagai klien (`OAUTH_CLIENTS`). Berikutnya: I2 (repositori data survei), I7 (analitik), I10 (DOI).
 4. **Diferensiasi (Fase 3):** P2 (RAG/tanya-jawab), P3 (rekomendasi), P4–P6.

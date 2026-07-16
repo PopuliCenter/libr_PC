@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import InterestPicker from '../../components/InterestPicker';
 import { api } from '../../lib/api';
 
 export default function RegisterPage() {
@@ -11,6 +12,8 @@ export default function RegisterPage() {
     password: '',
     institution: '',
   });
+  const [interests, setInterests] = useState<string[]>([]);
+  const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [done, setDone] = useState(false);
@@ -23,6 +26,8 @@ export default function RegisterPage() {
       await api.post('/auth/register', {
         ...form,
         institution: form.institution || undefined,
+        interests,
+        newsletterConsent: consent,
       });
       setDone(true);
     } catch (err) {
@@ -87,7 +92,13 @@ export default function RegisterPage() {
             onChange={(e) => setForm({ ...form, institution: e.target.value })}
           />
         </div>
-        <button className="btn" disabled={busy} style={{ width: '100%' }}>
+        <InterestPicker
+          interests={interests}
+          onInterests={setInterests}
+          consent={consent}
+          onConsent={setConsent}
+        />
+        <button className="btn" disabled={busy} style={{ width: '100%', marginTop: 16 }}>
           {busy ? 'Memproses…' : 'Daftar'}
         </button>
         <p style={{ marginTop: 14, fontSize: 14 }}>

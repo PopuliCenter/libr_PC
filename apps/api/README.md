@@ -39,6 +39,7 @@ src/
 |---|---|---|
 | `POST /auth/register` → `POST /auth/verify-email` | publik | Registrasi + verifikasi (dev: tautan verifikasi muncul di log server) |
 | `POST /auth/login`, `POST /auth/refresh`, `GET /auth/me` | publik/member | Autentikasi JWT |
+| `PATCH /auth/me/preferences` | member | Ubah minat (slug kategori), consent newsletter, & nomor WhatsApp (segmentasi diseminasi) |
 | `GET /auth/google` → callback | publik | Login Google (503 bila `GOOGLE_CLIENT_ID` kosong) |
 | `GET /.well-known/openid-configuration` · `GET /oauth/jwks` | publik | Discovery OIDC + kunci publik penandatangan (RS256) |
 | `GET /oauth/authorize/context` · `POST /oauth/authorize` | publik / member | Konteks consent (nama klien+scope) & penerbitan authorization code (butuh login perpustakaan) |
@@ -76,9 +77,10 @@ Endpoint `/api/v1/oai` mengikuti OAI-PMH 2.0 dengan metadata `oai_dc` (Dublin Co
 ## Notifikasi (email + WhatsApp)
 
 Notifikasi bersifat **event-driven**: `loan.created`, `loan.expiring` (H-1),
-`loan.expired`, `hold.offered` dipancarkan modul loans/holds dan didengarkan
-`NotificationsListener`, yang mengirim lewat **semua channel aktif** secara
-independen (kegagalan satu channel tak memengaruhi yang lain / alur utama):
+`loan.expired`, `hold.offered`, dan `document.published` dipancarkan modul
+loans/holds/catalog dan didengarkan `NotificationsListener`, yang mengirim lewat
+**semua channel aktif** secara independen (kegagalan satu channel tak memengaruhi
+yang lain / alur utama):
 
 - **Email** — selalu (dev: log; prod: ganti `MailService.send()` dgn SMTP).
 - **WhatsApp** (PRD I5) — hanya bila anggota mencantumkan nomor **dan** gateway
@@ -88,9 +90,14 @@ independen (kegagalan satu channel tak memengaruhi yang lain / alur utama):
   - `meta` (WhatsApp Cloud API, `WA_META_PHONE_ID` + `WA_META_TOKEN`).
   Nomor dinormalisasi ke format internasional (`WA_DEFAULT_COUNTRY`, default 62).
 
-> Opt-out per-anggota & notifikasi "terbitan baru sesuai minat" menyusul bersama
-> I6 (segmentasi minat + consent UU PDP). Pesan WA saat ini bersifat transaksional
-> (tentang pinjaman/antrian milik anggota sendiri).
+**Segmentasi diseminasi (PRD I6):** saat koleksi baru **PUBLISHED**, event
+`document.published` memicu notifikasi (email + WA) **hanya** ke anggota yang
+(a) menyetujui newsletter (`newsletterConsent`, consent UU PDP) dan (b) minatnya
+(slug kategori) beririsan dengan topik koleksi (slug kategori + subjek ter-slug).
+Koleksi diberi `announcedAt` sekali seumur hidup → tak ada pengumuman ganda meski
+di-edit ulang. Anggota mengelola minat/consent/nomor via `PATCH /auth/me/preferences`
+(atau saat registrasi). Pesan pengingat sewa/antrian tetap transaksional (tanpa
+syarat consent, karena tentang pinjaman anggota sendiri).
 
 ## SSO — OpenID Connect Provider (PRD I1: akun tunggal Populi)
 

@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { DATETIME } from '../../../database/column-types';
 import { Category } from './category.entity';
 
 export type AccessType = 'OPEN' | 'MEMBER' | 'LOAN';
@@ -102,6 +103,10 @@ export class Document {
   @Index()
   @Column({ type: 'varchar', nullable: true })
   sourceChecksum: string | null;
+
+  /** Diisi sekali saat pengumuman "terbitan baru" dikirim (idempotensi — PRD I6). */
+  @Column({ type: DATETIME, nullable: true })
+  announcedAt: Date | null;
 
   @CreateDateColumn()
   createdAt: Date;

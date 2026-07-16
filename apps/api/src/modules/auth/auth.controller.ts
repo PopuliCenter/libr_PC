@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  Patch,
   Post,
   Req,
   Res,
@@ -19,6 +20,7 @@ import { AuthService } from './auth.service';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { UpdatePreferencesDto } from './dto/update-preferences.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 
 @Controller('auth')
@@ -61,6 +63,17 @@ export class AuthController {
   @Get('me')
   me(@CurrentUser() user: User) {
     const { passwordHash, verificationTokenHash, ...safe } = user;
+    return safe;
+  }
+
+  @Audited('user.preferences', 'user')
+  @Patch('me/preferences')
+  async updatePreferences(
+    @CurrentUser() user: User,
+    @Body() dto: UpdatePreferencesDto,
+  ) {
+    const updated = await this.authService.updatePreferences(user.id, dto);
+    const { passwordHash, verificationTokenHash, ...safe } = updated;
     return safe;
   }
 

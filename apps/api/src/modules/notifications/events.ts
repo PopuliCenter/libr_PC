@@ -7,6 +7,7 @@ export const LOAN_CREATED = 'loan.created';
 export const LOAN_EXPIRING = 'loan.expiring';
 export const LOAN_RELEASED = 'loan.released';
 export const HOLD_OFFERED = 'hold.offered';
+export const DOCUMENT_PUBLISHED = 'document.published';
 
 export class LoanCreatedEvent {
   constructor(
@@ -40,5 +41,16 @@ export class HoldOfferedEvent {
     readonly documentTitle: string,
     readonly documentSlug: string,
     readonly offerExpiresAt: Date,
+  ) {}
+}
+
+/** Koleksi baru terbit → notifikasi ke anggota yang minatnya cocok (PRD I6). */
+export class DocumentPublishedEvent {
+  constructor(
+    readonly documentId: string,
+    readonly title: string,
+    readonly slug: string,
+    /** Topik koleksi (slug kategori + subjek) untuk pencocokan minat. */
+    readonly topics: string[],
   ) {}
 }

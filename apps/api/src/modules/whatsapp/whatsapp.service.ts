@@ -141,6 +141,13 @@ export class WhatsappService {
     );
   }
 
+  newPublication(phone: string, title: string, url: string): Promise<WaResult> {
+    return this.send(
+      phone,
+      `📚 *Populi Library*\nTerbitan baru sesuai minat Anda: "${title}". Lihat: ${url}`,
+    );
+  }
+
   // ===================================================================
   // Driver
   // ===================================================================

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../components/AuthContext';
+import InterestPicker from '../../components/InterestPicker';
 import { api, Hold, Loan } from '../../lib/api';
 
 const ROLE_LABEL: Record<string, string> = {
@@ -26,16 +27,45 @@ const HOLD_LABEL: Record<string, string> = {
 };
 
 export default function AccountPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, refresh } = useAuth();
   const [loans, setLoans] = useState<Loan[]>([]);
   const [holds, setHolds] = useState<Hold[]>([]);
+
+  // Preferensi diseminasi (minat/consent/telepon).
+  const [interests, setInterests] = useState<string[]>([]);
+  const [consent, setConsent] = useState(false);
+  const [phone, setPhone] = useState('');
+  const [savingPref, setSavingPref] = useState(false);
+  const [prefNotice, setPrefNotice] = useState<{ kind: string; text: string } | null>(null);
 
   useEffect(() => {
     if (user) {
       api.get<Loan[]>('/me/loans').then(setLoans).catch(() => undefined);
       api.get<Hold[]>('/me/holds').then(setHolds).catch(() => undefined);
+      setInterests(user.interests ?? []);
+      setConsent(user.newsletterConsent ?? false);
+      setPhone(user.phone ?? '');
     }
   }, [user]);
+
+  async function savePreferences(e: React.FormEvent) {
+    e.preventDefault();
+    setSavingPref(true);
+    setPrefNotice(null);
+    try {
+      await api.patch('/auth/me/preferences', {
+        interests,
+        newsletterConsent: consent,
+        phone,
+      });
+      await refresh();
+      setPrefNotice({ kind: 'success', text: 'Preferensi tersimpan.' });
+    } catch (err) {
+      setPrefNotice({ kind: 'error', text: (err as Error).message });
+    } finally {
+      setSavingPref(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -71,6 +101,35 @@ export default function AccountPage() {
           <dd>{user.status === 'active' ? 'Aktif' : user.status}</dd>
         </dl>
       </div>
+
+      <h2 style={{ fontSize: 18, margin: '28px 0 12px' }}>Minat & Notifikasi</h2>
+      <form className="card" style={{ maxWidth: 620 }} onSubmit={savePreferences}>
+        {prefNotice && (
+          <div className={`alert ${prefNotice.kind}`}>{prefNotice.text}</div>
+        )}
+        <InterestPicker
+          interests={interests}
+          onInterests={setInterests}
+          consent={consent}
+          onConsent={setConsent}
+        />
+        <div className="field" style={{ marginTop: 16 }}>
+          <label>Nomor WhatsApp (opsional)</label>
+          <input
+            type="tel"
+            placeholder="mis. 0812xxxxxxxx"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+          <p style={{ fontSize: 12, color: 'var(--ink-soft)', marginTop: 5 }}>
+            Untuk pengingat jatuh tempo sewa, giliran antrian, dan kabar terbitan baru via WhatsApp.
+          </p>
+        </div>
+        <button className="btn" disabled={savingPref}>
+          {savingPref ? 'Menyimpan…' : 'Simpan Preferensi'}
+        </button>
+      </form>
+
       <h2 style={{ fontSize: 18, margin: '28px 0 12px' }}>Peminjaman Saya</h2>
       {loans.length === 0 ? (
         <p className="page-sub">Belum ada peminjaman.</p>

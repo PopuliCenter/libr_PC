@@ -67,4 +67,12 @@ export class MailService {
       `Kabar baik! Kopi digital "${title}" kini tersedia untuk Anda.\nKlaim sebelum ${this.fmt(offerExpiresAt)} — bila terlewat, giliran berpindah ke antrian berikutnya.\nKlaim di sini: ${claimUrl}`,
     );
   }
+
+  async sendNewPublication(to: string, title: string, url: string): Promise<void> {
+    await this.send(
+      to,
+      `Terbitan baru sesuai minat Anda: ${title}`,
+      `Koleksi baru "${title}" telah terbit di Perpustakaan Digital Populi Center, sesuai topik minat Anda.\nLihat selengkapnya: ${url}\n\nAnda menerima email ini karena menyetujui pemberitahuan terbitan baru. Ubah preferensi di halaman Akun Saya.`,
+    );
+  }
 }

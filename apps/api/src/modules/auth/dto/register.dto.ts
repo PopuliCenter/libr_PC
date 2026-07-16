@@ -1,4 +1,7 @@
 import {
+  ArrayMaxSize,
+  IsArray,
+  IsBoolean,
   IsEmail,
   IsNotEmpty,
   IsOptional,
@@ -24,4 +27,16 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   institution?: string;
+
+  /** Slug kategori yang diminati (segmentasi diseminasi). */
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(50)
+  @IsString({ each: true })
+  interests?: string[];
+
+  /** Persetujuan menerima notifikasi terbitan baru (UU PDP). */
+  @IsOptional()
+  @IsBoolean()
+  newsletterConsent?: boolean;
 }
