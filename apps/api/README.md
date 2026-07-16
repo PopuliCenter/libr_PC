@@ -28,6 +28,8 @@ src/
     ├── oai/           # OAI-PMH 2.0 (oai_dc) utk Indonesia OneSearch
     ├── chat/          # chat bantuan: Claude (tool-use ke katalog) / fallback FAQ
     ├── mail/          # pengirim email (dev: log; prod: ganti SMTP)
+    ├── whatsapp/      # channel notifikasi WhatsApp (log/Fonnte/Meta Cloud API)
+    ├── notifications/ # listener event → kirim email + WhatsApp (dual-channel)
     └── health/
 ```
 
@@ -70,6 +72,25 @@ src/
 ## Integrasi jejaring perpustakaan (OAI-PMH)
 
 Endpoint `/api/v1/oai` mengikuti OAI-PMH 2.0 dengan metadata `oai_dc` (Dublin Core). Untuk didaftarkan ke **Indonesia OneSearch**: deploy API pada URL publik HTTPS, set `OAI_BASE_URL`, lalu daftarkan base URL tersebut di onesearch.id (menu keanggotaan repositori). Hanya koleksi berstatus `PUBLISHED` yang di-harvest.
+
+## Notifikasi (email + WhatsApp)
+
+Notifikasi bersifat **event-driven**: `loan.created`, `loan.expiring` (H-1),
+`loan.expired`, `hold.offered` dipancarkan modul loans/holds dan didengarkan
+`NotificationsListener`, yang mengirim lewat **semua channel aktif** secara
+independen (kegagalan satu channel tak memengaruhi yang lain / alur utama):
+
+- **Email** — selalu (dev: log; prod: ganti `MailService.send()` dgn SMTP).
+- **WhatsApp** (PRD I5) — hanya bila anggota mencantumkan nomor **dan** gateway
+  dikonfigurasi. Provider dipilih via `WA_PROVIDER`:
+  - `log` (default dev) menulis ke log; `none` (default prod) menonaktifkan;
+  - `fonnte` (gateway WABA lokal, `WA_FONNTE_TOKEN`);
+  - `meta` (WhatsApp Cloud API, `WA_META_PHONE_ID` + `WA_META_TOKEN`).
+  Nomor dinormalisasi ke format internasional (`WA_DEFAULT_COUNTRY`, default 62).
+
+> Opt-out per-anggota & notifikasi "terbitan baru sesuai minat" menyusul bersama
+> I6 (segmentasi minat + consent UU PDP). Pesan WA saat ini bersifat transaksional
+> (tentang pinjaman/antrian milik anggota sendiri).
 
 ## SSO — OpenID Connect Provider (PRD I1: akun tunggal Populi)
 

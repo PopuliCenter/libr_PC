@@ -177,7 +177,10 @@ Idempotensi: `import_items.checksum` (SHA-256 file) — file identik yang diimpo
 - **Ekspor ke vendor:** antrian dapat diekspor xlsx dengan kolom yang sama dengan template impor F6 (`nama_file` pre-generated dari nomor induk) — hasil vendor tinggal masuk pipeline impor massal tanpa mapping ulang.
 
 ### 2.8 Modul Notifikasi
-Event-driven via queue: `loan.created`, `loan.expiring(H-1)`, `loan.expired`, `hold.offered`, `user.registered`. Template email Bahasa Indonesia; retry 3× dengan backoff.
+Event-driven: `loan.created`, `loan.expiring(H-1)`, `loan.expired`, `hold.offered`. `NotificationsListener` mengirim ke **semua channel aktif** — masing-masing di-try/catch terpisah agar kegagalan satu channel tak memengaruhi yang lain maupun alur utama.
+
+- **Email** — selalu; template Bahasa Indonesia (dev: log; prod: SMTP).
+- **WhatsApp (PRD I5)** — modul `whatsapp/` provider-agnostik dengan driver dipilih via `WA_PROVIDER` (`log` dev / `none` prod-default / `fonnte` / `meta` Cloud API). Dikirim hanya bila anggota punya nomor **dan** channel aktif. Nomor dinormalisasi ke format internasional (`WA_DEFAULT_COUNTRY`, default 62 → mis. `0812…`→`62812…`). Panggilan gateway pakai `AbortController` timeout 8 dtk; kegagalan mengembalikan `{ok:false}` tanpa melempar. Pesan WA transaksional (ringkas, gaya WA). Opt-out per-anggota & "terbitan baru sesuai minat" menyusul dengan I6.
 
 ### 2.9 Modul SSO — OpenID Connect Provider (PRD I1)
 

@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { OnEvent } from '@nestjs/event-emitter';
 import { MailService } from '../mail/mail.service';
 import { UsersService } from '../users/users.service';
+import { WhatsappService } from '../whatsapp/whatsapp.service';
 import {
   HOLD_OFFERED,
   HoldOfferedEvent,
@@ -15,8 +16,10 @@ import {
 } from './events';
 
 /**
- * Mendengarkan event domain dan mengirim email terkait.
- * Kegagalan email tidak boleh memengaruhi alur utama (di-catch).
+ * Mendengarkan event domain dan mengirim notifikasi lewat semua channel yang
+ * aktif (email selalu; WhatsApp bila anggota punya nomor & gateway dikonfigurasi).
+ * Tiap channel dikirim independen — kegagalan satu channel tak memengaruhi yang
+ * lain maupun alur utama.
  */
 @Injectable()
 export class NotificationsListener {
@@ -25,53 +28,75 @@ export class NotificationsListener {
   constructor(
     private readonly users: UsersService,
     private readonly mail: MailService,
+    private readonly whatsapp: WhatsappService,
     private readonly config: ConfigService,
   ) {}
 
   @OnEvent(LOAN_CREATED)
   async onLoanCreated(e: LoanCreatedEvent): Promise<void> {
-    await this.toUser(e.userId, (email) =>
-      this.mail.sendLoanCreated(email, e.documentTitle, e.expiresAt),
+    await this.dispatch(
+      e.userId,
+      (email) => this.mail.sendLoanCreated(email, e.documentTitle, e.expiresAt),
+      (phone) => this.whatsapp.loanCreated(phone, e.documentTitle, e.expiresAt),
     );
   }
 
   @OnEvent(LOAN_EXPIRING)
   async onLoanExpiring(e: LoanExpiringEvent): Promise<void> {
-    await this.toUser(e.userId, (email) =>
-      this.mail.sendLoanExpiringSoon(email, e.documentTitle, e.expiresAt),
+    await this.dispatch(
+      e.userId,
+      (email) => this.mail.sendLoanExpiringSoon(email, e.documentTitle, e.expiresAt),
+      (phone) => this.whatsapp.loanExpiringSoon(phone, e.documentTitle, e.expiresAt),
     );
   }
 
   @OnEvent(LOAN_RELEASED)
   async onLoanReleased(e: LoanReleasedEvent): Promise<void> {
-    if (e.reason !== 'expired') return; // pengembalian manual tak perlu email
-    await this.toUser(e.userId, (email) =>
-      this.mail.sendLoanExpired(email, e.documentTitle),
+    if (e.reason !== 'expired') return; // pengembalian manual tak perlu notifikasi
+    await this.dispatch(
+      e.userId,
+      (email) => this.mail.sendLoanExpired(email, e.documentTitle),
+      (phone) => this.whatsapp.loanExpired(phone, e.documentTitle),
     );
   }
 
   @OnEvent(HOLD_OFFERED)
   async onHoldOffered(e: HoldOfferedEvent): Promise<void> {
     const webUrl = this.config.get('WEB_URL', 'http://localhost:3000');
-    await this.toUser(e.userId, (email) =>
-      this.mail.sendHoldOffered(
-        email,
-        e.documentTitle,
-        `${webUrl}/katalog/${e.documentSlug}`,
-        e.offerExpiresAt,
-      ),
+    const claimUrl = `${webUrl}/katalog/${e.documentSlug}`;
+    await this.dispatch(
+      e.userId,
+      (email) =>
+        this.mail.sendHoldOffered(email, e.documentTitle, claimUrl, e.offerExpiresAt),
+      (phone) =>
+        this.whatsapp.holdOffered(phone, e.documentTitle, claimUrl, e.offerExpiresAt),
     );
   }
 
-  private async toUser(
+  /**
+   * Kirim ke semua channel anggota. Email selalu; WhatsApp hanya bila anggota
+   * mencantumkan nomor. Tiap channel di-try/catch terpisah.
+   */
+  private async dispatch(
     userId: string,
-    sendFn: (email: string) => Promise<void>,
+    email: (email: string) => Promise<unknown>,
+    whatsapp: (phone: string) => Promise<unknown>,
   ): Promise<void> {
+    const user = await this.users.findById(userId).catch(() => null);
+    if (!user) return;
+
     try {
-      const user = await this.users.findById(userId);
-      if (user) await sendFn(user.email);
+      await email(user.email);
     } catch (err) {
-      this.logger.error(`Gagal mengirim notifikasi: ${(err as Error).message}`);
+      this.logger.error(`Notifikasi email gagal: ${(err as Error).message}`);
+    }
+
+    if (user.phone && this.whatsapp.enabled) {
+      try {
+        await whatsapp(user.phone);
+      } catch (err) {
+        this.logger.error(`Notifikasi WhatsApp gagal: ${(err as Error).message}`);
+      }
     }
   }
 }
