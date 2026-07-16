@@ -189,6 +189,12 @@ Perpustakaan menjadi **penerbit identitas** bagi aplikasi survei & layanan Popul
 - **Keamanan:** kode otorisasi **sekali-pakai** (disimpan sebagai hash) & **berumur 60 detik** (tabel `oauth_authorization_codes`, cron pembersih) → anti-replay; `redirect_uri` **cocok persis** → anti open-redirect; scope dibatasi per klien (`openid` wajib); klaim identitas ter-scope (`profile`→name, `email`→email+email_verified) — **`role` internal tak pernah diterbitkan** ke klien, mencegah eskalasi hak akses lewat SSO.
 - **Interop:** `/.well-known/openid-configuration` + JWKS membuat pustaka OIDC standar (mis. di aplikasi survei) mengonsumsi tanpa kode khusus.
 
+### 2.10 Sitasi & metadata akademik (PRD I9)
+
+- **Formatter murni** (`web/lib/citations.ts`): APA 7, Chicago, BibTeX dari metadata koleksi — fungsi tanpa efek, mudah diuji. Tipe BibTeX menyesuaikan `collectionType` (`jurnal`→article, `buku`→book, `laporan`→techreport, dst.). Nama penulis **tidak dibalik** menjadi "Marga, Inisial" karena konvensi nama Indonesia tak selalu berstruktur begitu — ditampilkan apa adanya agar tak salah.
+- **Komponen Kutip** (`CiteBox`): tab APA/Chicago/BibTeX + salin ke clipboard.
+- **Meta Google Scholar:** halaman detail koleksi diubah menjadi **server component** dengan `generateMetadata` yang merender tag `citation_*` (`citation_title`, `citation_author` per penulis, `citation_publication_date`, `citation_publisher`, `citation_language`, `citation_keywords`) di HTML **sisi server** — syarat agar terindeks Google Scholar. Bagian interaktif (pinjam/antre/baca) tetap client component (`DocumentDetailClient`) yang menerima dokumen hasil fetch server sebagai prop (tanpa fetch ganda).
+
 ---
 
 ## 3. Desain Data (skema inti)

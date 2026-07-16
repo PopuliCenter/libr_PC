@@ -249,7 +249,7 @@ Arah besar: perpustakaan ini bukan sistem yang berdiri sendiri, melainkan **pint
 | # | Fitur | Nilai | Prasyarat teknis |
 |---|---|---|---|
 | I8 | **Indonesia OneSearch (Perpusnas) via OAI-PMH** — katalog ter-harvest otomatis ke jejaring perpustakaan nasional | Ditemukan oleh seluruh pemustaka Indonesia | Endpoint OAI-PMH (metadata sudah Dublin Core–compatible sejak Fase 1 — memang disiapkan untuk ini) |
-| I9 | **Sitasi siap pakai** — tombol "Kutip" (APA/Chicago/BibTeX) di tiap halaman detail; metadata Google Scholar (`citation_*` meta tags) | Memudahkan akademisi mengutip; naik di Scholar | Murni frontend + metadata; murah, dampak tinggi |
+| I9 ✅ | **Sitasi siap pakai** — tombol "Kutip" (APA/Chicago/BibTeX) di tiap halaman detail; metadata Google Scholar (`citation_*` meta tags) | Memudahkan akademisi mengutip; naik di Scholar | **Terimplementasi**: komponen Kutip (`CiteBox`) + `lib/citations.ts`; halaman detail jadi server component dengan `generateMetadata` yang merender `citation_*` di server (terindeks Scholar). |
 | I10 | **DOI untuk publikasi resmi** (Crossref/DataCite) | Publikasi tersitasi permanen, terlacak | Keanggotaan Crossref; field `doi` per dokumen |
 
 ### 9.3 Penyempurnaan produk
@@ -265,7 +265,7 @@ Arah besar: perpustakaan ini bukan sistem yang berdiri sendiri, melainkan **pint
 
 ### 9.4 Urutan yang disarankan
 
-1. **Cepat & murah, kerjakan dulu (bersamaan akhir Fase 1b):** I9 (sitasi), I3 (widget website), I4 (tautan acara).
+1. **Cepat & murah, kerjakan dulu (bersamaan akhir Fase 1b):** ~~I9 (sitasi)~~ **✅ selesai**, I3 (widget website), I4 (tautan acara).
 2. **Gelombang integrasi pertama (Fase 2):** I5 (WhatsApp), I6 (segmentasi minat), I8 (OneSearch), P1 (koleksi internal).
 3. **Strategis (Fase 2–3):** ~~I1 (SSO)~~ **✅ selesai** — perpustakaan sudah jadi OIDC Provider; aplikasi survei tinggal didaftarkan sebagai klien (`OAUTH_CLIENTS`). Berikutnya: I2 (repositori data survei), I7 (analitik), I10 (DOI).
 4. **Diferensiasi (Fase 3):** P2 (RAG/tanya-jawab), P3 (rekomendasi), P4–P6.
