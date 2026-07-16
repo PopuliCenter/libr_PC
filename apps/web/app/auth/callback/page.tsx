@@ -20,7 +20,11 @@ function GoogleCallbackInner() {
     const refreshToken = params.get('refreshToken');
     if (accessToken && refreshToken) {
       saveTokens(accessToken, refreshToken);
-      refresh().then(() => router.push('/'));
+      // Lanjutkan ke tujuan yang tersimpan (mis. alur consent SSO), jika ada.
+      const next = sessionStorage.getItem('postLoginNext');
+      sessionStorage.removeItem('postLoginNext');
+      const dest = next && next.startsWith('/') && !next.startsWith('//') ? next : '/';
+      refresh().then(() => router.push(dest));
     } else {
       router.push('/masuk');
     }

@@ -236,7 +236,7 @@ Arah besar: perpustakaan ini bukan sistem yang berdiri sendiri, melainkan **pint
 
 | # | Fitur | Nilai | Prasyarat teknis |
 |---|---|---|---|
-| I1 | **Akun tunggal Populi (SSO/OIDC)** — satu akun untuk e-library, aplikasi survei, pendaftaran acara, dan layanan lain | Anggota cukup daftar sekali; data audiens terkonsolidasi | Identity provider mandiri (mis. Keycloak) atau e-library dijadikan penerbit OAuth2/OIDC; arsitektur auth Fase 1 (JWT) sudah kompatibel |
+| I1 ✅ | **Akun tunggal Populi (SSO/OIDC)** — satu akun untuk e-library, aplikasi survei, pendaftaran acara, dan layanan lain | Anggota cukup daftar sekali; data audiens terkonsolidasi | **Terimplementasi**: e-library menjadi **OpenID Connect Provider** (Authorization Code + PKCE, id_token RS256 + JWKS, userinfo, refresh). Aplikasi survei tinggal jadi klien OAuth. Lihat `apps/api` modul `oauth/` & README §SSO. Alternatif external IdP (Keycloak) tetap kompatibel. |
 | I2 | **Repositori data survei** — laporan riset ditautkan dengan **dataset**-nya (CSV/SPSS/toplines); akses dataset via formulir permohonan + persetujuan syarat penggunaan data | Nilai akademik naik drastis; sitasi ke Populi bertambah; permintaan data yang selama ini via email jadi tertata | Tipe koleksi baru `dataset` + alur `data_request` (ajukan → setujui → unduh berjangka waktu, memakai mekanisme signed URL yang sudah ada) |
 | I3 | **Widget & API untuk website utama** — blok "Publikasi Terbaru" di populicenter.org otomatis menarik dari katalog; tautan "Baca di e-Library" | Satu sumber kebenaran; tak ada upload dobel ke website & library | API publik read-only `GET /documents` (sudah ada) + embeddable widget/RSS |
 | I4 | **Tautan acara & multimedia** — record publikasi memuat tautan peluncuran/diskusi (YouTube, podcast); sebaliknya halaman acara menaut ke publikasi | Konteks lengkap: baca laporannya, tonton diskusinya | Field `related_links JSONB` per dokumen; tipe koleksi `video/audio` (metadata + embed, tanpa DRM) |
@@ -267,5 +267,5 @@ Arah besar: perpustakaan ini bukan sistem yang berdiri sendiri, melainkan **pint
 
 1. **Cepat & murah, kerjakan dulu (bersamaan akhir Fase 1b):** I9 (sitasi), I3 (widget website), I4 (tautan acara).
 2. **Gelombang integrasi pertama (Fase 2):** I5 (WhatsApp), I6 (segmentasi minat), I8 (OneSearch), P1 (koleksi internal).
-3. **Strategis (Fase 2–3):** I1 (SSO — kerjakan saat aplikasi survei siap terhubung), I2 (repositori data survei), I7 (analitik), I10 (DOI).
+3. **Strategis (Fase 2–3):** ~~I1 (SSO)~~ **✅ selesai** — perpustakaan sudah jadi OIDC Provider; aplikasi survei tinggal didaftarkan sebagai klien (`OAUTH_CLIENTS`). Berikutnya: I2 (repositori data survei), I7 (analitik), I10 (DOI).
 4. **Diferensiasi (Fase 3):** P2 (RAG/tanya-jawab), P3 (rekomendasi), P4–P6.

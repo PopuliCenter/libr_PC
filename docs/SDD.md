@@ -179,6 +179,16 @@ Idempotensi: `import_items.checksum` (SHA-256 file) — file identik yang diimpo
 ### 2.8 Modul Notifikasi
 Event-driven via queue: `loan.created`, `loan.expiring(H-1)`, `loan.expired`, `hold.offered`, `user.registered`. Template email Bahasa Indonesia; retry 3× dengan backoff.
 
+### 2.9 Modul SSO — OpenID Connect Provider (PRD I1)
+
+Perpustakaan menjadi **penerbit identitas** bagi aplikasi survei & layanan Populi lain — satu akun untuk semua. Dipilih ketimbang IdP eksternal karena semua akun (termasuk konsolidasi Google login) sudah ada di sini dan arsitektur JWT Fase 1 kompatibel.
+
+- **Alur:** OAuth 2.0 Authorization Code **+ PKCE wajib** (S256). Endpoint `authorization_endpoint` adalah **halaman consent di web** (SPA berbasis JWT localStorage, bukan cookie sesi server): halaman memastikan anggota login, memanggil `POST /oauth/authorize` dengan token anggota, backend menerbitkan `code` → redirect ke `redirect_uri` klien. Klien menukar `code` di `POST /oauth/token`, memverifikasi `id_token` via `/oauth/jwks`, dan/atau memanggil `/oauth/userinfo`.
+- **Kunci & token:** `id_token`/`access_token`/`refresh_token` ditandatangani **RS256** (kunci RSA per-issuer, publik dipublikasikan sebagai **JWKS**) sehingga klien memverifikasi tanpa berbagi rahasia. Kunci dari `OIDC_PRIVATE_KEY` (persisten di produksi; dev membuat kunci sementara + peringatan).
+- **Registri klien:** dari env `OAUTH_CLIENTS` (JSON), bukan admin-UI — tak ada permukaan tulis publik untuk mendaftarkan klien. Klien confidential (punya `client_secret`) diverifikasi di token endpoint; klien publik cukup PKCE.
+- **Keamanan:** kode otorisasi **sekali-pakai** (disimpan sebagai hash) & **berumur 60 detik** (tabel `oauth_authorization_codes`, cron pembersih) → anti-replay; `redirect_uri` **cocok persis** → anti open-redirect; scope dibatasi per klien (`openid` wajib); klaim identitas ter-scope (`profile`→name, `email`→email+email_verified) — **`role` internal tak pernah diterbitkan** ke klien, mencegah eskalasi hak akses lewat SSO.
+- **Interop:** `/.well-known/openid-configuration` + JWKS membuat pustaka OIDC standar (mis. di aplikasi survei) mengonsumsi tanpa kode khusus.
+
 ---
 
 ## 3. Desain Data (skema inti)

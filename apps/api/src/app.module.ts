@@ -21,6 +21,7 @@ import { ReaderModule } from './modules/reader/reader.module';
 import { ImportModule } from './modules/import/import.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { OAuthModule } from './modules/oauth/oauth.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
     ImportModule,
     InventoryModule,
     NotificationsModule,
+    OAuthModule,
     OaiModule,
     ChatModule,
     HealthModule,

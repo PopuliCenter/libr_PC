@@ -31,6 +31,13 @@ export function assertProductionConfig(): void {
       'DB_SYNC masih "true" (skema diubah otomatis saat runtime). Set DB_SYNC=false dan pakai migration.',
     );
   }
+  // SSO/OIDC: bila ada klien terdaftar, kunci penandatangan wajib persisten —
+  // kunci sementara membuat semua id_token tak valid setiap restart.
+  if ((process.env.OAUTH_CLIENTS ?? '').trim() && !(process.env.OIDC_PRIVATE_KEY ?? '').trim()) {
+    problems.push(
+      'OAUTH_CLIENTS terisi tapi OIDC_PRIVATE_KEY kosong. Sediakan kunci RSA privat (PEM PKCS#8) yang persisten untuk penandatangan OIDC.',
+    );
+  }
 
   if (problems.length > 0) {
     console.error('\nKonfigurasi produksi tidak aman — aplikasi dihentikan:');

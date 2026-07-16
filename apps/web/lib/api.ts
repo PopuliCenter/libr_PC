@@ -117,6 +117,11 @@ export interface StocktakeDetail {
   };
 }
 
+export interface AuthorizationContext {
+  client: { clientId: string; name: string; logoUri?: string };
+  scopes: { key: string; label: string }[];
+}
+
 export interface ImportBatch {
   id: string;
   filename: string;
