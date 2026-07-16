@@ -21,6 +21,10 @@ import { join } from 'path';
             username: config.get<string>('DB_USER', ''),
             password: config.get<string>('DB_PASSWORD', ''),
             database: config.get<string>('DB_NAME', ''),
+            // Saat sync dimatikan (produksi), skema dikelola migration
+            // dan dijalankan otomatis ketika aplikasi boot.
+            migrations: [join(__dirname, 'migrations', '*.js')],
+            migrationsRun: config.get('DB_SYNC', 'true') !== 'true',
             ...common,
           };
         }

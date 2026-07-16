@@ -60,18 +60,19 @@ async function main() {
 
   for (const item of items) {
     try {
+      // Klausa disusun kondisional agar portabel SQLite & PostgreSQL
+      // (PG tidak menerima "kolom IS :param" untuk nilai non-NULL).
+      const titleClause =
+        item.year === null
+          ? '(LOWER(doc.title) = :title AND doc.year IS NULL)'
+          : '(LOWER(doc.title) = :title AND doc.year = :year)';
       const dupe = await docRepo
         .createQueryBuilder('doc')
-        .where(
-          item.isbn
-            ? 'doc.isbnIssn = :isbn OR (LOWER(doc.title) = :title AND doc.year IS :year)'
-            : 'LOWER(doc.title) = :title AND doc.year IS :year',
-          {
-            isbn: item.isbn,
-            title: item.title.toLowerCase(),
-            year: item.year,
-          },
-        )
+        .where(item.isbn ? `doc.isbnIssn = :isbn OR ${titleClause}` : titleClause, {
+          isbn: item.isbn,
+          title: item.title.toLowerCase(),
+          year: item.year,
+        })
         .getOne();
       if (dupe) {
         skipped++;

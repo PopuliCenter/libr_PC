@@ -1,0 +1,58 @@
+name: populi-library
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER:-library}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-library}
+      POSTGRES_DB: ${DB_NAME:-populi_library}
+    ports:
+      # Host memakai 5433 agar tidak bentrok dengan PostgreSQL native di mesin dev.
+      - "${DB_HOST_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-library} -d ${DB_NAME:-populi_library}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: apps/api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      WEB_URL: ${WEB_URL:-http://localhost:3000}
+      DB_TYPE: postgres
+      DB_SYNC: "false"           # skema dikelola migration (dijalankan otomatis saat boot)
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-library}
+      DB_PASSWORD: ${DB_PASSWORD:-library}
+      DB_NAME: ${DB_NAME:-populi_library}
+      JWT_SECRET: ${JWT_SECRET:?Isi JWT_SECRET di file .env (mis. hasil openssl rand -hex 32)}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@populicenter.org}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Isi ADMIN_PASSWORD di file .env}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      CHAT_MODEL: ${CHAT_MODEL:-claude-opus-4-8}
+      OAI_BASE_URL: ${OAI_BASE_URL:-http://localhost:3001/api/v1/oai}
+    ports:
+      - "3001:3001"
+
+  web:
+    build:
+      context: apps/web
+      args:
+        # URL API yang dipanggil dari BROWSER pengguna (bukan antar-container).
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001/api/v1}
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:

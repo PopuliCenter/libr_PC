@@ -54,8 +54,35 @@ src/
 
 Endpoint `/api/v1/oai` mengikuti OAI-PMH 2.0 dengan metadata `oai_dc` (Dublin Core). Untuk didaftarkan ke **Indonesia OneSearch**: deploy API pada URL publik HTTPS, set `OAI_BASE_URL`, lalu daftarkan base URL tersebut di onesearch.id (menu keanggotaan repositori). Hanya koleksi berstatus `PUBLISHED` yang di-harvest.
 
+## Migration database (PostgreSQL)
+
+Skema produksi dikelola migration TypeORM (bukan `synchronize`). Saat aplikasi boot
+dengan `DB_SYNC=false`, migration yang belum jalan dieksekusi otomatis.
+
+```bash
+# generate migration baru setelah mengubah entity (butuh PG berjalan, mis. docker compose up -d postgres)
+DB_TYPE=postgres DB_PORT=5433 npm run migration:generate -- src/database/migrations/NamaPerubahan
+
+# jalankan / batalkan manual
+DB_TYPE=postgres DB_PORT=5433 npm run migration:run
+DB_TYPE=postgres DB_PORT=5433 npm run migration:revert
+```
+
+## Menjalankan dengan Docker (produksi-like)
+
+Dari root repo:
+
+```bash
+copy .env.example .env     # isi JWT_SECRET & ADMIN_PASSWORD (wajib — guard menolak default)
+docker compose up -d --build
+# web: http://localhost:3000 | api: http://localhost:3001 | postgres: localhost:5433
+```
+
+Aplikasi **menolak start** di `NODE_ENV=production` bila `JWT_SECRET`/`ADMIN_PASSWORD`
+masih kosong/default, `DB_TYPE` bukan postgres, atau `DB_SYNC` masih true
+(lihat `src/config/production-guard.ts`).
+
 ## Produksi
 
-- Set `DB_TYPE=postgres` + kredensialnya, `DB_SYNC=false` (pakai migration), `JWT_SECRET` acak kuat.
 - Ganti `MailService.send()` dengan SMTP/provider sungguhan.
-- Modul berikutnya (lihat task list / SDD): protected reader, sewa digital, impor massal, frontend web.
+- Modul berikutnya (lihat task list / SDD): protected reader, sewa digital, impor massal.
