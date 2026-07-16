@@ -1,0 +1,18 @@
+# Dependensi & hasil build
+node_modules/
+dist/
+.next/
+out/
+
+# Data runtime (database dev, hasil konversi impor)
+apps/api/data/
+
+# Konfigurasi lokal berisi secret
+.env
+.env.local
+.env.*.local
+
+# Lain-lain
+*.log
+.DS_Store
+Thumbs.db
