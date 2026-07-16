@@ -23,6 +23,7 @@ export interface DocumentItem {
   category: Category | null;
   accessType: 'OPEN' | 'MEMBER' | 'LOAN';
   status?: string;
+  loanDurations: number[];
   previewPages: number;
   physicalCopies: number;
   pageCount: number | null;
@@ -34,6 +35,23 @@ export interface DocumentItem {
 export interface PagedResult<T> {
   data: T[];
   meta: { page: number; perPage: number; total: number; totalPages: number };
+}
+
+export interface Loan {
+  id: string;
+  status: 'ACTIVE' | 'RETURNED' | 'EXPIRED';
+  durationDays: number;
+  borrowedAt: string;
+  expiresAt: string;
+  document: DocumentItem;
+}
+
+export interface ReaderSession {
+  sessionId: string;
+  documentId: string;
+  title: string;
+  pageCount: number | null;
+  lastPage: number;
 }
 
 export interface UserProfile {
@@ -120,6 +138,25 @@ async function request<T>(
 
   if (res.status === 204) return undefined as T;
   return res.json();
+}
+
+/** Ambil resource biner (halaman reader) dengan header Authorization. */
+export async function apiBlob(path: string): Promise<Blob> {
+  const tokens = getTokens();
+  const res = await fetch(`${API_URL}${path}`, {
+    headers: tokens ? { Authorization: `Bearer ${tokens.accessToken}` } : {},
+  });
+  if (!res.ok) {
+    let message = `Gagal memuat (${res.status})`;
+    try {
+      const body = await res.json();
+      message = body.message ?? message;
+    } catch {
+      /* bukan JSON */
+    }
+    throw new ApiError(res.status, message);
+  }
+  return res.blob();
 }
 
 export const api = {

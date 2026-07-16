@@ -42,6 +42,9 @@ src/
 | `GET /categories` | publik | Daftar kategori |
 | `POST/PATCH/DELETE /admin/documents` | librarian+ | CRUD koleksi (ter-audit) |
 | `GET /admin/audit-logs` | superadmin | Query audit log |
+| `POST /loans` · `POST /loans/:id/return` · `GET /me/loans` | member | Sewa digital: kuota lisensi per koleksi, batas 3 pinjaman aktif, kedaluwarsa otomatis (lazy check + cron per menit) |
+| `POST /reader/sessions` → `GET /reader/sessions/:id/pages/:n` | member | Protected reader: halaman dirender server-side (MuPDF) ber-watermark identitas; `no-store`; tipe LOAN wajib pinjaman aktif |
+| `POST /admin/documents/:id/upload` | librarian+ | Upload PDF master (multipart `file`, validasi magic bytes, hitung halaman) |
 | `GET /oai?verb=Identify` dll. | publik | OAI-PMH: Identify, ListMetadataFormats, ListIdentifiers, ListRecords, GetRecord (oai_dc) |
 | `POST /chat/messages` | publik (rate-limited) | Chat bantuan; `GET /chat/sessions/:id/messages` untuk riwayat |
 

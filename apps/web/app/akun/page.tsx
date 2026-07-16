@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../components/AuthContext';
+import { api, Loan } from '../../lib/api';
 
 const ROLE_LABEL: Record<string, string> = {
   member: 'Anggota',
@@ -9,8 +11,21 @@ const ROLE_LABEL: Record<string, string> = {
   superadmin: 'Super Admin',
 };
 
+const LOAN_LABEL: Record<string, string> = {
+  ACTIVE: 'Aktif',
+  RETURNED: 'Dikembalikan',
+  EXPIRED: 'Kedaluwarsa',
+};
+
 export default function AccountPage() {
   const { user, loading } = useAuth();
+  const [loans, setLoans] = useState<Loan[]>([]);
+
+  useEffect(() => {
+    if (user) {
+      api.get<Loan[]>('/me/loans').then(setLoans).catch(() => undefined);
+    }
+  }, [user]);
 
   if (loading) {
     return (
@@ -46,10 +61,44 @@ export default function AccountPage() {
           <dd>{user.status === 'active' ? 'Aktif' : user.status}</dd>
         </dl>
       </div>
-      <p className="page-sub" style={{ marginTop: 16 }}>
-        Riwayat baca dan peminjaman akan tampil di sini setelah modul sewa
-        digital tersedia.
-      </p>
+      <h2 style={{ fontSize: 18, margin: '28px 0 12px' }}>Peminjaman Saya</h2>
+      {loans.length === 0 ? (
+        <p className="page-sub">Belum ada peminjaman.</p>
+      ) : (
+        <div className="card" style={{ overflowX: 'auto' }}>
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Koleksi</th>
+                <th>Status</th>
+                <th>Jatuh tempo</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {loans.map((loan) => (
+                <tr key={loan.id}>
+                  <td>
+                    <Link href={`/katalog/${loan.document.slug}`}>
+                      {loan.document.title}
+                    </Link>
+                  </td>
+                  <td>{LOAN_LABEL[loan.status] ?? loan.status}</td>
+                  <td>{new Date(loan.expiresAt).toLocaleString('id-ID')}</td>
+                  <td>
+                    {loan.status === 'ACTIVE' && (
+                      <Link className="btn" style={{ padding: '5px 12px', fontSize: 13 }}
+                        href={`/baca/${loan.document.slug}`}>
+                        Baca
+                      </Link>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

@@ -102,6 +102,18 @@ export class DocumentsService {
     return this.repo.save(doc);
   }
 
+  /** Dipanggil setelah upload PDF master berhasil. */
+  async setDigitalFile(
+    id: string,
+    masterObjectKey: string,
+    pageCount: number,
+  ): Promise<Document> {
+    const doc = await this.findById(id);
+    doc.masterObjectKey = masterObjectKey;
+    doc.pageCount = pageCount;
+    return this.repo.save(doc);
+  }
+
   async remove(id: string): Promise<void> {
     const doc = await this.findById(id);
     await this.repo.remove(doc);
