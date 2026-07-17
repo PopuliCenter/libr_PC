@@ -114,6 +114,7 @@ export default function AdminPage() {
           <p className="page-sub">Tambah dan kelola koleksi perpustakaan.</p>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <Link href="/admin/analitik" className="btn secondary">📈 Analitik</Link>
           <Link href="/admin/inventaris" className="btn secondary">📷 Inventaris Fisik</Link>
           <Link href="/admin/impor" className="btn">📦 Impor Massal</Link>
         </div>

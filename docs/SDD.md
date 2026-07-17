@@ -201,6 +201,15 @@ Perpustakaan menjadi **penerbit identitas** bagi aplikasi survei & layanan Popul
 - **Komponen Kutip** (`CiteBox`): tab APA/Chicago/BibTeX + salin ke clipboard.
 - **Meta Google Scholar:** halaman detail koleksi diubah menjadi **server component** dengan `generateMetadata` yang merender tag `citation_*` (`citation_title`, `citation_author` per penulis, `citation_publication_date`, `citation_publisher`, `citation_language`, `citation_keywords`) di HTML **sisi server** — syarat agar terindeks Google Scholar. Bagian interaktif (pinjam/antre/baca) tetap client component (`DocumentDetailClient`) yang menerima dokumen hasil fetch server sebagai prop (tanpa fetch ganda).
 
+### 2.11a Analitik diseminasi (PRD I7)
+
+Modul `analytics/` = **lapisan dasbor read-only** di atas data Fase 1 — **tanpa tabel baru**. Sumber sinyal: `reading_sessions` (satu baris per buka reader = "pembacaan"), `loans`, `holds`, `users` (segmen `institution`), `documents` (topik `category`).
+
+- **Endpoint** (`/admin/analytics`, `@Roles('librarian','superadmin')`): `?days=` (0=semua) → `{overview, topDocuments, byInstitution, byCategory, trend}`; `report.xlsx` mengekspor 5 sheet (Ringkasan/Publikasi/Institusi/Topik/Tren).
+- **Agregasi di aplikasi**, bukan SQL `GROUP BY` + filter tanggal — sengaja, untuk portabilitas SQLite/PostgreSQL dan menghindari perbedaan format datetime antar-driver (pernah menimbulkan bug di antrian). Baris diambil dgn cap (skala Fase 1); bila membesar → SQL/materialized view.
+- **Tren**: harian (isi hari kosong dgn 0) bila rentang ≤ 45 hari, selain itu bulanan (≤ 12 bucket).
+- **Catatan kejujuran vs PRD**: PRD menyebut tabel `reading_events` & segmen "wilayah"; keduanya belum ada. Sinyal baca nyata memakai `reading_sessions`; segmen "wilayah" butuh field `region` pada user (belum dikumpulkan saat registrasi). Frontend: `/admin/analitik` — KPI, tabel, bar CSS (tanpa pustaka chart), selektor rentang, unduh xlsx.
+
 ### 2.11 Sindikasi ke situs utama (PRD I3)
 
 Modul `syndication/` mengekspos katalog PUBLISHED sebagai satu sumber kebenaran untuk populicenter.org — tak ada unggah dobel.

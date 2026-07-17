@@ -230,6 +230,33 @@ table.admin-table th { font-size: 12px; text-transform: uppercase; letter-spacin
   border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin-bottom: 12px;
 }
 
+/* ===== Dasbor analitik (I7) ===== */
+.kpi-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px; margin-bottom: 24px;
+}
+.kpi-card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 14px 16px; text-align: center;
+}
+.kpi-card b { display: block; font-size: 26px; color: var(--accent-strong); line-height: 1.2; }
+.kpi-card span { font-size: 12px; color: var(--ink-soft); }
+.analytics-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 720px) { .analytics-cols { grid-template-columns: 1fr; } }
+.bar-list { display: flex; flex-direction: column; gap: 9px; }
+.bar-row { display: grid; grid-template-columns: 130px 1fr 36px; gap: 10px; align-items: center; font-size: 13px; }
+.bar-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-soft); }
+.bar-track { background: #eef1f5; border-radius: 999px; height: 14px; overflow: hidden; }
+.bar-fill { background: var(--accent); height: 100%; border-radius: 999px; min-width: 2px; }
+.bar-value { text-align: right; font-weight: 600; }
+.trend-chart {
+  display: flex; align-items: flex-end; gap: 3px; height: 120px;
+  border-bottom: 1px solid var(--line); padding-top: 4px;
+}
+.trend-col { flex: 1; height: 100%; display: flex; align-items: flex-end; }
+.trend-bar { width: 100%; background: var(--accent); border-radius: 3px 3px 0 0; min-height: 2px; transition: opacity 0.15s; }
+.trend-col:hover .trend-bar { opacity: 0.7; }
+
 /* ===== Acara & multimedia terkait (I4) ===== */
 .embed-frame { position: relative; width: 100%; border-radius: 8px; overflow: hidden; background: #000; }
 .embed-frame.video { aspect-ratio: 16 / 9; }

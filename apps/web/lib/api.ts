@@ -129,6 +129,31 @@ export interface AuthorizationContext {
   scopes: { key: string; label: string }[];
 }
 
+export interface AnalyticsDashboard {
+  window: { days: number; since: string | null; generatedAt: string };
+  overview: {
+    reads: number;
+    uniqueReaders: number;
+    loans: number;
+    activeLoans: number;
+    publishedDocuments: number;
+    totalMembers: number;
+    newMembers: number;
+    waitlist: number;
+  };
+  topDocuments: {
+    documentId: string;
+    title: string;
+    slug: string | null;
+    category: string | null;
+    reads: number;
+    loans: number;
+  }[];
+  byInstitution: { label: string; reads: number }[];
+  byCategory: { label: string; reads: number }[];
+  trend: { bucket: string; reads: number }[];
+}
+
 export interface ImportBatch {
   id: string;
   filename: string;

@@ -23,6 +23,7 @@ import { InventoryModule } from './modules/inventory/inventory.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { OAuthModule } from './modules/oauth/oauth.module';
 import { SyndicationModule } from './modules/syndication/syndication.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { SyndicationModule } from './modules/syndication/syndication.module';
     NotificationsModule,
     OAuthModule,
     SyndicationModule,
+    AnalyticsModule,
     OaiModule,
     ChatModule,
     HealthModule,

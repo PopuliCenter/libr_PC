@@ -62,6 +62,7 @@ src/
 | `POST /admin/labels` | librarian+ | Lembar stiker label QR (PDF) untuk daftar nomor induk |
 | `POST /admin/stocktakes` → `.../:id/scan` → `.../:id/close` · `.../:id/report` | librarian+ | Stock opname: scan idempoten (offline-tolerant), hitung hilang/salah lokasi, laporan xlsx |
 | `GET /admin/inventory/report` | librarian+ | Rekap inventaris (xlsx) |
+| `GET /admin/analytics?days=` · `.../report.xlsx` | librarian+ | Dasbor analitik diseminasi (PRD I7): pembacaan, publikasi terpopuler, per institusi/topik, tren + unduh xlsx |
 | `GET /feed.rss` | publik | Umpan RSS 2.0 "Publikasi Terbaru" (dukung `?category=slug`) untuk situs utama & pembaca RSS |
 | `GET /widget.js` · `GET /widget/publications` | publik | Widget tersemat untuk populicenter.org (skrip loader + data JSON ber-CORS) |
 | `GET /oai?verb=Identify` dll. | publik | OAI-PMH: Identify, ListMetadataFormats, ListIdentifiers, ListRecords, GetRecord (oai_dc) |
