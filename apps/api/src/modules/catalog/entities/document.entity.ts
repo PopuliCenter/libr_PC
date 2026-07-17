@@ -18,8 +18,27 @@ export type CollectionType =
   | 'jurnal'
   | 'prosiding'
   | 'dataset'
+  | 'video'
+  | 'audio'
   | 'lainnya';
 export type CopyrightStatus = 'OWNED' | 'LICENSED' | 'UNCLEARED';
+
+/** Jenis tautan terkait (untuk ikon/label & pemilihan embed). */
+export type RelatedLinkKind =
+  | 'video'
+  | 'podcast'
+  | 'news'
+  | 'slides'
+  | 'dataset'
+  | 'event'
+  | 'other';
+
+/** Tautan peluncuran/diskusi/multimedia terkait koleksi (PRD I4). */
+export interface RelatedLink {
+  kind: RelatedLinkKind;
+  title: string;
+  url: string;
+}
 
 @Entity('documents')
 export class Document {
@@ -61,6 +80,10 @@ export class Document {
 
   @Column({ type: 'simple-json', default: '[]' })
   subjects: string[];
+
+  /** Tautan peluncuran/diskusi/multimedia terkait (PRD I4). */
+  @Column({ type: 'simple-json', default: '[]' })
+  relatedLinks: RelatedLink[];
 
   @ManyToOne(() => Category, { nullable: true, eager: true, onDelete: 'SET NULL' })
   category: Category | null;

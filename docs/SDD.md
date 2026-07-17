@@ -81,6 +81,7 @@ Arsitektur **modular monolith + worker** — cukup sederhana untuk tim kecil, te
 - Full-text search: kolom `search_vector tsvector` (judul, penulis, subjek, abstrak, hasil OCR) + GIN index. Upgrade path: Meilisearch/Typesense bila butuh typo-tolerance.
 - Status koleksi: `DRAFT → PUBLISHED → ARCHIVED`.
 - Tipe akses: `OPEN` (publik), `MEMBER` (login), `LOAN` (harus pinjam).
+- **Tautan acara & multimedia (PRD I4):** kolom `relatedLinks` (JSON: `{kind, title, url}[]`, tervalidasi `@ValidateNested`) + tipe koleksi `video`/`audio` (metadata + embed, tanpa DRM). Halaman detail merender **embed hanya untuk penyedia allowlist** (YouTube/Spotify/SoundCloud) via `lib/embed.ts` — URL diubah ke pola `/embed/` yang dikenal; sumber lain tampil sebagai tautan biasa, sehingga tak ada iframe dari host sembarangan. Tautan halaman detail publik sekaligus menjadi jalur balik dari halaman acara ke publikasi.
 
 ### 2.3 Modul Protected Reader — desain proteksi
 

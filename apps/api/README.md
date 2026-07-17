@@ -47,7 +47,7 @@ src/
 | `GET /documents?query=&category=&year=&type=` | publik | Pencarian katalog (hanya PUBLISHED) |
 | `GET /documents/:slug` | publik | Detail koleksi |
 | `GET /categories` | publik | Daftar kategori |
-| `POST/PATCH/DELETE /admin/documents` | librarian+ | CRUD koleksi (ter-audit) |
+| `POST/PATCH/DELETE /admin/documents` | librarian+ | CRUD koleksi (ter-audit); dukung `relatedLinks[]` (tautan acara/multimedia, PRD I4) & tipe `video`/`audio` |
 | `GET /admin/audit-logs` | superadmin | Query audit log |
 | `POST /loans` · `POST /loans/:id/return` · `GET /me/loans` | member | Sewa digital: kuota lisensi per koleksi, batas 3 pinjaman aktif, kedaluwarsa otomatis (lazy check + cron per menit) |
 | `GET /documents/:id/availability` | member | Ketersediaan + posisi antrian user (dipakai UI menentukan Pinjam/Antre/Klaim/Baca) |

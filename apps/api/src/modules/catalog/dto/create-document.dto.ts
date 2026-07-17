@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
   IsArray,
@@ -7,6 +8,7 @@ import {
   IsOptional,
   IsString,
   Min,
+  ValidateNested,
 } from 'class-validator';
 import {
   AccessType,
@@ -14,6 +16,7 @@ import {
   CopyrightStatus,
   DocumentStatus,
 } from '../entities/document.entity';
+import { RelatedLinkDto } from './related-link.dto';
 
 export class CreateDocumentDto {
   @IsNotEmpty({ message: 'Judul wajib diisi' })
@@ -36,7 +39,7 @@ export class CreateDocumentDto {
   isbnIssn?: string;
 
   @IsOptional()
-  @IsIn(['buku', 'laporan', 'jurnal', 'prosiding', 'dataset', 'lainnya'])
+  @IsIn(['buku', 'laporan', 'jurnal', 'prosiding', 'dataset', 'video', 'audio', 'lainnya'])
   collectionType?: CollectionType;
 
   @IsOptional()
@@ -54,6 +57,12 @@ export class CreateDocumentDto {
   @IsOptional()
   @IsArray()
   subjects?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => RelatedLinkDto)
+  relatedLinks?: RelatedLinkDto[];
 
   @IsOptional()
   @IsString()

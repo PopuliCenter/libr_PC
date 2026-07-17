@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../../components/AuthContext';
 import CiteBox from '../../../components/CiteBox';
+import RelatedMedia from '../../../components/RelatedMedia';
 import { api, Availability, DocumentItem } from '../../../lib/api';
 
 const ACCESS_INFO: Record<string, string> = {
@@ -57,6 +58,8 @@ export default function DocumentDetailClient({
   }
 
   const isStaff = user && (user.role === 'librarian' || user.role === 'superadmin');
+  const isMultimedia =
+    doc.collectionType === 'video' || doc.collectionType === 'audio';
 
   return (
     <div className="container page">
@@ -82,8 +85,10 @@ export default function DocumentDetailClient({
 
       <div className="card" style={{ marginBottom: 20 }}>
         <div className="alert info" style={{ marginBottom: 16 }}>
-          {ACCESS_INFO[doc.accessType]}
-          {!doc.hasDigitalCopy &&
+          {isMultimedia
+            ? 'Koleksi multimedia — tonton/dengarkan pada pemutar di bawah.'
+            : ACCESS_INFO[doc.accessType]}
+          {!isMultimedia && !doc.hasDigitalCopy &&
             ' Versi digital koleksi ini belum tersedia — hubungi pustakawan.'}
         </div>
 
@@ -148,6 +153,8 @@ export default function DocumentDetailClient({
             </div>
           )}
       </div>
+
+      <RelatedMedia links={doc.relatedLinks} />
 
       {doc.abstract && (
         <section className="card" style={{ marginBottom: 20 }}>

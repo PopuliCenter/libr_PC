@@ -15,10 +15,15 @@ const EMPTY_FORM = {
   status: 'PUBLISHED',
 };
 
+const LINK_KINDS = ['video', 'podcast', 'news', 'slides', 'dataset', 'event', 'other'];
+
+type LinkRow = { kind: string; title: string; url: string };
+
 export default function AdminPage() {
   const { user, loading } = useAuth();
   const [docs, setDocs] = useState<DocumentItem[]>([]);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [links, setLinks] = useState<LinkRow[]>([]);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<{ kind: string; text: string } | null>(
     null,
@@ -72,8 +77,16 @@ export default function AdminPage() {
         accessType: form.accessType,
         abstract: form.abstract || undefined,
         status: form.status,
+        relatedLinks: links
+          .filter((l) => l.url.trim())
+          .map((l) => ({
+            kind: l.kind,
+            title: l.title.trim() || l.url.trim(),
+            url: l.url.trim(),
+          })),
       });
       setForm(EMPTY_FORM);
+      setLinks([]);
       setNotice({ kind: 'success', text: 'Koleksi berhasil ditambahkan.' });
       await load();
     } catch (err) {
@@ -144,7 +157,7 @@ export default function AdminPage() {
                   setForm({ ...form, collectionType: e.target.value })
                 }
               >
-                {['buku', 'laporan', 'jurnal', 'prosiding', 'dataset', 'lainnya'].map(
+                {['buku', 'laporan', 'jurnal', 'prosiding', 'dataset', 'video', 'audio', 'lainnya'].map(
                   (t) => (
                     <option key={t}>{t}</option>
                   ),
@@ -183,6 +196,40 @@ export default function AdminPage() {
               onChange={(e) => setForm({ ...form, abstract: e.target.value })}
             />
           </div>
+
+          <div className="field">
+            <label>Tautan acara & multimedia terkait</label>
+            <p style={{ fontSize: 12, color: 'var(--ink-soft)', marginBottom: 8 }}>
+              Tautan peluncuran/diskusi (YouTube, podcast), berita, atau materi. YouTube/Spotify/SoundCloud tampil sebagai pemutar di halaman detail.
+            </p>
+            {links.map((l, i) => (
+              <div key={i} style={{ display: 'grid', gridTemplateColumns: '130px 1fr 1.6fr auto', gap: 8, marginBottom: 8 }}>
+                <select
+                  value={l.kind}
+                  onChange={(e) => setLinks(links.map((x, j) => (j === i ? { ...x, kind: e.target.value } : x)))}
+                >
+                  {LINK_KINDS.map((k) => (<option key={k}>{k}</option>))}
+                </select>
+                <input
+                  placeholder="Judul"
+                  value={l.title}
+                  onChange={(e) => setLinks(links.map((x, j) => (j === i ? { ...x, title: e.target.value } : x)))}
+                />
+                <input
+                  placeholder="https://…"
+                  value={l.url}
+                  onChange={(e) => setLinks(links.map((x, j) => (j === i ? { ...x, url: e.target.value } : x)))}
+                />
+                <button type="button" className="btn danger" style={{ padding: '4px 10px' }}
+                  onClick={() => setLinks(links.filter((_, j) => j !== i))}>✕</button>
+              </div>
+            ))}
+            <button type="button" className="btn secondary" style={{ padding: '6px 14px', fontSize: 13 }}
+              onClick={() => setLinks([...links, { kind: 'video', title: '', url: '' }])}>
+              + Tambah tautan
+            </button>
+          </div>
+
           <button className="btn" disabled={busy}>
             {busy ? 'Menyimpan…' : 'Simpan Koleksi'}
           </button>

@@ -9,6 +9,12 @@ export interface Category {
   slug: string;
 }
 
+export interface RelatedLink {
+  kind: 'video' | 'podcast' | 'news' | 'slides' | 'dataset' | 'event' | 'other';
+  title: string;
+  url: string;
+}
+
 export interface DocumentItem {
   id: string;
   title: string;
@@ -20,6 +26,7 @@ export interface DocumentItem {
   language: string;
   abstract: string | null;
   subjects: string[];
+  relatedLinks: RelatedLink[];
   category: Category | null;
   accessType: 'OPEN' | 'MEMBER' | 'LOAN';
   status?: string;
