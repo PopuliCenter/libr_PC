@@ -200,6 +200,13 @@ Perpustakaan menjadi **penerbit identitas** bagi aplikasi survei & layanan Popul
 - **Komponen Kutip** (`CiteBox`): tab APA/Chicago/BibTeX + salin ke clipboard.
 - **Meta Google Scholar:** halaman detail koleksi diubah menjadi **server component** dengan `generateMetadata` yang merender tag `citation_*` (`citation_title`, `citation_author` per penulis, `citation_publication_date`, `citation_publisher`, `citation_language`, `citation_keywords`) di HTML **sisi server** — syarat agar terindeks Google Scholar. Bagian interaktif (pinjam/antre/baca) tetap client component (`DocumentDetailClient`) yang menerima dokumen hasil fetch server sebagai prop (tanpa fetch ganda).
 
+### 2.11 Sindikasi ke situs utama (PRD I3)
+
+Modul `syndication/` mengekspos katalog PUBLISHED sebagai satu sumber kebenaran untuk populicenter.org — tak ada unggah dobel.
+
+- **Widget tersemat**: `GET /widget.js` mengembalikan skrip loader mandiri (Content-Type `application/javascript`, cache 1 jam). Skrip menemukan basis API dari `src`-nya sendiri (`document.currentScript`, dgn fallback query bila `async`), memanggil `GET /widget/publications` (JSON, header `Access-Control-Allow-Origin: *` → aman di-fetch lintas-origin dari situs mana pun), lalu menyuntik daftar bergaya inline (escaped) yang menaut ke halaman detail e-library. Response `{home, items[]}` agar footer menaut ke home perpustakaan, bukan origin API.
+- **RSS 2.0**: `GET /feed.rss` (filter `?category=slug`, cache 5 mnt) memakai util XML yang sama dgn OAI (`xmlEscape`/`tag`), `pubDate` RFC-822, `dc:creator` per penulis, `atom:link rel=self`. Ditemukan otomatis via `<link rel="alternate" type="application/rss+xml">` di `app/layout.tsx`. Cocok untuk pembaca RSS & RSS-campaign Mailchimp.
+
 ---
 
 ## 3. Desain Data (skema inti)

@@ -62,6 +62,8 @@ src/
 | `POST /admin/labels` | librarian+ | Lembar stiker label QR (PDF) untuk daftar nomor induk |
 | `POST /admin/stocktakes` → `.../:id/scan` → `.../:id/close` · `.../:id/report` | librarian+ | Stock opname: scan idempoten (offline-tolerant), hitung hilang/salah lokasi, laporan xlsx |
 | `GET /admin/inventory/report` | librarian+ | Rekap inventaris (xlsx) |
+| `GET /feed.rss` | publik | Umpan RSS 2.0 "Publikasi Terbaru" (dukung `?category=slug`) untuk situs utama & pembaca RSS |
+| `GET /widget.js` · `GET /widget/publications` | publik | Widget tersemat untuk populicenter.org (skrip loader + data JSON ber-CORS) |
 | `GET /oai?verb=Identify` dll. | publik | OAI-PMH: Identify, ListMetadataFormats, ListIdentifiers, ListRecords, GetRecord (oai_dc) |
 | `POST /chat/messages` | publik (rate-limited) | Chat bantuan; `GET /chat/sessions/:id/messages` untuk riwayat |
 
@@ -98,6 +100,26 @@ Koleksi diberi `announcedAt` sekali seumur hidup → tak ada pengumuman ganda me
 di-edit ulang. Anggota mengelola minat/consent/nomor via `PATCH /auth/me/preferences`
 (atau saat registrasi). Pesan pengingat sewa/antrian tetap transaksional (tanpa
 syarat consent, karena tentang pinjaman anggota sendiri).
+
+## Sindikasi ke situs utama (PRD I3: widget & RSS)
+
+Agar populicenter.org menampilkan "Publikasi Terbaru" tanpa unggah dobel — satu
+sumber kebenaran (katalog PUBLISHED):
+
+- **Widget tersemat** — cukup satu baris di halaman mana pun:
+  ```html
+  <script src="https://<api>/api/v1/widget.js"
+          data-title="Publikasi Terbaru" data-limit="5" data-category="politik"></script>
+  ```
+  Skrip menemukan basis API dari `src`-nya sendiri, mengambil
+  `GET /widget/publications` (JSON ber-CORS `*`), lalu menyuntik daftar bergaya
+  minimal yang menaut ke halaman detail e-library. Contoh siap pakai:
+  `apps/web/public/widget-contoh.html`.
+- **Umpan RSS 2.0** — `GET /feed.rss` (dukung `?category=slug`); ditemukan
+  otomatis lewat `<link rel="alternate" type="application/rss+xml">` di situs.
+  Cocok untuk pembaca RSS, Mailchimp RSS-campaign, atau agregator.
+
+Semua read-only & publik; hanya koleksi PUBLISHED yang muncul.
 
 ## SSO — OpenID Connect Provider (PRD I1: akun tunggal Populi)
 

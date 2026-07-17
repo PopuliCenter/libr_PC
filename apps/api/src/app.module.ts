@@ -22,6 +22,7 @@ import { ImportModule } from './modules/import/import.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { OAuthModule } from './modules/oauth/oauth.module';
+import { SyndicationModule } from './modules/syndication/syndication.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { OAuthModule } from './modules/oauth/oauth.module';
     InventoryModule,
     NotificationsModule,
     OAuthModule,
+    SyndicationModule,
     OaiModule,
     ChatModule,
     HealthModule,
