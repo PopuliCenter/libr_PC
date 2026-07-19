@@ -55,6 +55,7 @@ src/
 | `GET /documents/:id/availability` | member | Ketersediaan + posisi antrian user (dipakai UI menentukan Pinjam/Antre/Klaim/Baca) |
 | `POST /holds` · `POST /holds/:id/claim` · `POST /holds/:id/cancel` · `GET /me/holds` | member | Antrian FIFO saat lisensi penuh; tawaran jendela klaim 24 jam (cron per menit) |
 | `POST /reader/sessions` → `GET /reader/sessions/:id/pages/:n` | member | Protected reader: halaman dirender server-side (MuPDF) ber-watermark identitas; `no-store`; tipe LOAN wajib pinjaman aktif |
+| `GET/POST /me/annotations` · `PATCH/DELETE /me/annotations/:id` | member | Catatan pribadi per halaman (PRD P5) — tersimpan per akun, bukan di berkas (DRM utuh); privat per pengguna |
 | `POST /admin/documents/:id/upload` | librarian+ | Upload PDF master (multipart `file`, validasi magic bytes, hitung halaman) |
 | `GET /admin/import/template` | librarian+ | Unduh template Excel (sheet Koleksi + Petunjuk) |
 | `POST /admin/import/batches` (ZIP) → `POST .../:id/commit` | librarian+ | Impor massal: unggah ZIP (template+PDF) → validasi pra-impor → impor background (buat koleksi, master PDF, hitung halaman, idempoten via checksum) |

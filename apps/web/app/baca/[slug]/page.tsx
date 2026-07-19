@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../../components/AuthContext';
+import ReaderNotes from '../../../components/ReaderNotes';
 import {
   api,
   apiBlob,
@@ -24,6 +25,7 @@ export default function ReaderPage() {
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [showNotes, setShowNotes] = useState(false);
   const cache = useRef(new Map<number, string>());
 
   // Buka sesi baca setelah auth siap.
@@ -126,6 +128,14 @@ export default function ReaderPage() {
           ✕ Tutup
         </Link>
         <span className="reader-title">{session?.title ?? 'Memuat…'}</span>
+        {session && (
+          <button
+            className="reader-notes-toggle"
+            onClick={() => setShowNotes((s) => !s)}
+          >
+            📝 Catatan
+          </button>
+        )}
         <div className="reader-nav">
           <button onClick={() => go(-1)} disabled={page <= 1}>‹</button>
           <span>
@@ -141,19 +151,30 @@ export default function ReaderPage() {
         </div>
       </div>
 
-      <div className="reader-stage">
-        {error && error !== 'login' && (
-          <div className="alert error" style={{ margin: 24 }}>{error}</div>
-        )}
-        {!error && imgUrl && (
-          <img
-            src={imgUrl}
-            alt={`Halaman ${page}`}
-            className="reader-img"
-            draggable={false}
+      <div className="reader-body">
+        <div className="reader-stage">
+          {error && error !== 'login' && (
+            <div className="alert error" style={{ margin: 24 }}>{error}</div>
+          )}
+          {!error && imgUrl && (
+            <img
+              src={imgUrl}
+              alt={`Halaman ${page}`}
+              className="reader-img"
+              draggable={false}
+            />
+          )}
+          {busy && <div className="reader-loading">Memuat halaman…</div>}
+        </div>
+
+        {showNotes && session && (
+          <ReaderNotes
+            documentId={session.documentId}
+            page={page}
+            onJump={(n) => setPage(n)}
+            onClose={() => setShowNotes(false)}
           />
         )}
-        {busy && <div className="reader-loading">Memuat halaman…</div>}
       </div>
     </div>
   );

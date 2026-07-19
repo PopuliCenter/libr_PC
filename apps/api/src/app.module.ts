@@ -25,6 +25,7 @@ import { OAuthModule } from './modules/oauth/oauth.module';
 import { SyndicationModule } from './modules/syndication/syndication.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { RecommendationsModule } from './modules/recommendations/recommendations.module';
+import { AnnotationsModule } from './modules/annotations/annotations.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { RecommendationsModule } from './modules/recommendations/recommendations
     SyndicationModule,
     AnalyticsModule,
     RecommendationsModule,
+    AnnotationsModule,
     OaiModule,
     ChatModule,
     HealthModule,

@@ -175,6 +175,44 @@ table.admin-table th { font-size: 12px; text-transform: uppercase; letter-spacin
 @media print {
   .reader-page, .reader-page * { display: none !important; visibility: hidden !important; }
 }
+.reader-body { flex: 1; display: flex; min-height: 0; }
+.reader-body .reader-stage { flex: 1; }
+.reader-notes-toggle {
+  background: #2c313b; color: #e8eaf0; border: none; border-radius: 8px;
+  padding: 6px 12px; font-size: 13px; cursor: pointer; white-space: nowrap;
+}
+.reader-notes-toggle:hover { background: #384150; }
+.reader-notes {
+  width: min(340px, 82vw); background: #1b1e25; color: #e8eaf0;
+  border-left: 1px solid #2c313b; display: flex; flex-direction: column;
+  overflow-y: auto;
+}
+.reader-notes-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px; font-weight: 600; font-size: 14px;
+  border-bottom: 1px solid #2c313b; position: sticky; top: 0; background: #1b1e25;
+}
+.reader-notes-head button { background: none; border: none; color: #aeb6c4; cursor: pointer; font-size: 15px; }
+.reader-notes-add { padding: 14px 16px; border-bottom: 1px solid #2c313b; }
+.reader-notes-add label { display: block; font-size: 12px; color: #aeb6c4; margin-bottom: 6px; }
+.reader-notes-add textarea, .reader-note textarea {
+  width: 100%; background: #12151b; color: #e8eaf0; border: 1px solid #2c313b;
+  border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: inherit; resize: vertical;
+}
+.reader-notes-add .btn { margin-top: 8px; width: 100%; padding: 8px; }
+.reader-notes-list { padding: 8px 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+.reader-notes-empty { color: #6a7385; font-size: 13px; text-align: center; padding: 16px 0; }
+.reader-note { border: 1px solid #2c313b; border-radius: 10px; padding: 10px 12px; }
+.reader-note-page {
+  background: var(--accent); color: #fff; border: none; border-radius: 999px;
+  font-size: 11px; padding: 2px 10px; cursor: pointer; margin-bottom: 6px;
+}
+.reader-note-text { font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+.reader-note-actions { display: flex; gap: 12px; margin-top: 8px; }
+.reader-note-actions button {
+  background: none; border: none; color: #8fa9d0; font-size: 12px; cursor: pointer; padding: 0;
+}
+.reader-note-actions button:hover { text-decoration: underline; }
 
 /* ===== Pemindai barcode ===== */
 .scanner-overlay {

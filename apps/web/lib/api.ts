@@ -129,6 +129,15 @@ export interface AuthorizationContext {
   scopes: { key: string; label: string }[];
 }
 
+export interface Annotation {
+  id: string;
+  documentId: string;
+  pageNo: number;
+  note: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Recommendation {
   title: string;
   slug: string;
