@@ -18,6 +18,7 @@ export interface RelatedLink {
 export interface DocumentItem {
   id: string;
   title: string;
+  titleEn: string | null;
   slug: string;
   authors: string[];
   publisher: string | null;
@@ -25,6 +26,7 @@ export interface DocumentItem {
   collectionType: string;
   language: string;
   abstract: string | null;
+  abstractEn: string | null;
   subjects: string[];
   doi: string | null;
   relatedLinks: RelatedLink[];

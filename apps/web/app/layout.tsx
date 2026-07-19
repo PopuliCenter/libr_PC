@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { AuthProvider } from '../components/AuthContext';
+import { LanguageProvider } from '../components/LanguageContext';
 import ChatWidget from '../components/ChatWidget';
 import Header from '../components/Header';
 import { API_URL } from '../lib/api';
@@ -25,14 +26,16 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body>
-        <AuthProvider>
-          <Header />
-          <main>{children}</main>
-          <footer className="site-footer">
-            © {new Date().getFullYear()} Populi Center — library@populicenter.org
-          </footer>
-          <ChatWidget />
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <Header />
+            <main>{children}</main>
+            <footer className="site-footer">
+              © {new Date().getFullYear()} Populi Center — library@populicenter.org
+            </footer>
+            <ChatWidget />
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

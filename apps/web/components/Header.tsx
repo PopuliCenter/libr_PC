@@ -3,9 +3,11 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from './AuthContext';
+import { useLang } from './LanguageContext';
 
 export default function Header() {
   const { user, logout } = useAuth();
+  const { lang, setLang, t } = useLang();
   const router = useRouter();
 
   return (
@@ -16,12 +18,12 @@ export default function Header() {
           <span className="brand-sub">Perpustakaan Digital Populi Center</span>
         </Link>
         <nav className="nav">
-          <Link href="/">Katalog</Link>
-          <Link href="/dampak">Dampak</Link>
+          <Link href="/">{t('catalog')}</Link>
+          <Link href="/dampak">{t('impact')}</Link>
           {user ? (
             <>
               {(user.role === 'librarian' || user.role === 'superadmin') && (
-                <Link href="/admin">Admin</Link>
+                <Link href="/admin">{t('admin')}</Link>
               )}
               <Link href="/akun">{user.name.split(' ')[0]}</Link>
               <a
@@ -32,17 +34,24 @@ export default function Header() {
                   router.push('/');
                 }}
               >
-                Keluar
+                {t('logout')}
               </a>
             </>
           ) : (
             <>
-              <Link href="/masuk">Masuk</Link>
+              <Link href="/masuk">{t('signin')}</Link>
               <Link href="/daftar" className="btn secondary">
-                Daftar
+                {t('register')}
               </Link>
             </>
           )}
+          <button
+            className="lang-toggle"
+            onClick={() => setLang(lang === 'id' ? 'en' : 'id')}
+            title={lang === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia'}
+          >
+            {lang === 'id' ? 'EN' : 'ID'}
+          </button>
         </nav>
       </div>
     </header>

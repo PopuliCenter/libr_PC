@@ -2,12 +2,14 @@
 
 import { useMemo, useState } from 'react';
 import { buildCitations, CitableDoc } from '../lib/citations';
+import { useLang } from './LanguageContext';
 
 /**
  * Tombol "Kutip" pada halaman detail koleksi: menampilkan sitasi siap salin
  * dalam gaya APA, Chicago, dan BibTeX (PRD I9).
  */
 export default function CiteBox({ doc }: { doc: CitableDoc }) {
+  const { t } = useLang();
   const citations = useMemo(() => buildCitations(doc), [doc]);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<'apa' | 'chicago' | 'bibtex'>('apa');
@@ -28,7 +30,7 @@ export default function CiteBox({ doc }: { doc: CitableDoc }) {
   if (!open) {
     return (
       <button className="btn secondary" onClick={() => setOpen(true)}>
-        ❝ Kutip
+        {t('cite')}
       </button>
     );
   }

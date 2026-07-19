@@ -7,11 +7,13 @@ import { api, DocumentItem, PagedResult } from '../../lib/api';
 
 const EMPTY_FORM = {
   title: '',
+  titleEn: '',
   authors: '',
   year: '',
   collectionType: 'laporan',
   accessType: 'MEMBER',
   abstract: '',
+  abstractEn: '',
   status: 'PUBLISHED',
   doi: '',
 };
@@ -69,6 +71,7 @@ export default function AdminPage() {
     try {
       await api.post('/admin/documents', {
         title: form.title,
+        titleEn: form.titleEn.trim() || undefined,
         authors: form.authors
           .split(';')
           .map((a) => a.trim())
@@ -77,6 +80,7 @@ export default function AdminPage() {
         collectionType: form.collectionType,
         accessType: form.accessType,
         abstract: form.abstract || undefined,
+        abstractEn: form.abstractEn.trim() || undefined,
         status: form.status,
         doi: form.doi.trim() || undefined,
         relatedLinks: links
@@ -136,6 +140,14 @@ export default function AdminPage() {
               required
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
+            />
+          </div>
+          <div className="field">
+            <label>Judul (English, opsional)</label>
+            <input
+              value={form.titleEn}
+              placeholder="English title for international audience"
+              onChange={(e) => setForm({ ...form, titleEn: e.target.value })}
             />
           </div>
           <div className="field">
@@ -209,6 +221,15 @@ export default function AdminPage() {
               rows={3}
               value={form.abstract}
               onChange={(e) => setForm({ ...form, abstract: e.target.value })}
+            />
+          </div>
+          <div className="field">
+            <label>Abstrak (English, opsional)</label>
+            <textarea
+              rows={3}
+              value={form.abstractEn}
+              placeholder="English abstract for international audience"
+              onChange={(e) => setForm({ ...form, abstractEn: e.target.value })}
             />
           </div>
 

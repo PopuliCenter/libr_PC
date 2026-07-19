@@ -236,7 +236,7 @@ export class DocumentsService {
     if (query.query) {
       // SQLite dev: LIKE case-insensitive; PostgreSQL: upgrade ke tsvector/ILIKE.
       qb.andWhere(
-        '(LOWER(doc.title) LIKE :q OR LOWER(doc.abstract) LIKE :q OR LOWER(doc.authors) LIKE :q OR LOWER(doc.subjects) LIKE :q)',
+        '(LOWER(doc.title) LIKE :q OR LOWER(doc.titleEn) LIKE :q OR LOWER(doc.abstract) LIKE :q OR LOWER(doc.abstractEn) LIKE :q OR LOWER(doc.authors) LIKE :q OR LOWER(doc.subjects) LIKE :q)',
         { q: `%${query.query.toLowerCase()}%` },
       );
     }

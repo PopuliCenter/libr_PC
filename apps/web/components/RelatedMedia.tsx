@@ -2,12 +2,14 @@
 
 import { RelatedLink } from '../lib/api';
 import { LINK_KIND_LABEL, toEmbed } from '../lib/embed';
+import { useLang } from './LanguageContext';
 
 /**
  * Menampilkan tautan acara/multimedia terkait koleksi (PRD I4): pemutar embed
  * inline untuk penyedia tepercaya (YouTube/Spotify/SoundCloud) + daftar tautan.
  */
 export default function RelatedMedia({ links }: { links: RelatedLink[] }) {
+  const { t } = useLang();
   if (!links || links.length === 0) return null;
 
   const embeds = links
@@ -16,7 +18,7 @@ export default function RelatedMedia({ links }: { links: RelatedLink[] }) {
 
   return (
     <section className="card" style={{ marginBottom: 20 }}>
-      <h2 style={{ fontSize: 16, marginBottom: 12 }}>Acara & Multimedia Terkait</h2>
+      <h2 style={{ fontSize: 16, marginBottom: 12 }}>{t('relatedMedia')}</h2>
 
       {embeds.map(({ link, embed }) => (
         <div key={link.url} style={{ marginBottom: 16 }}>

@@ -182,10 +182,12 @@ export class OaiService {
 
   private recordXml(doc: Document): string {
     const dc = [
-      tag('dc:title', xmlEscape(doc.title)),
+      tag('dc:title', xmlEscape(doc.title), `xml:lang="${doc.language}"`),
+      doc.titleEn ? tag('dc:title', xmlEscape(doc.titleEn), 'xml:lang="en"') : '',
       ...doc.authors.map((a) => tag('dc:creator', xmlEscape(a))),
       ...(doc.subjects ?? []).map((s) => tag('dc:subject', xmlEscape(s))),
-      doc.abstract ? tag('dc:description', xmlEscape(doc.abstract)) : '',
+      doc.abstract ? tag('dc:description', xmlEscape(doc.abstract), `xml:lang="${doc.language}"`) : '',
+      doc.abstractEn ? tag('dc:description', xmlEscape(doc.abstractEn), 'xml:lang="en"') : '',
       doc.publisher ? tag('dc:publisher', xmlEscape(doc.publisher)) : '',
       doc.year ? tag('dc:date', String(doc.year)) : '',
       tag('dc:type', xmlEscape(doc.collectionType)),

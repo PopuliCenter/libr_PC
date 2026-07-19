@@ -49,6 +49,10 @@ export class Document {
   @Column()
   title: string;
 
+  /** Judul terjemahan Inggris (opsional) — katalog dwibahasa (PRD P4). */
+  @Column({ type: 'varchar', nullable: true })
+  titleEn: string | null;
+
   @Index({ unique: true })
   @Column()
   slug: string;
@@ -78,6 +82,10 @@ export class Document {
 
   @Column({ type: 'text', nullable: true })
   abstract: string | null;
+
+  /** Abstrak terjemahan Inggris (opsional) — katalog dwibahasa (PRD P4). */
+  @Column({ type: 'text', nullable: true })
+  abstractEn: string | null;
 
   @Column({ type: 'varchar', nullable: true })
   callNumber: string | null;

@@ -23,6 +23,10 @@ export class CreateDocumentDto {
   @IsNotEmpty({ message: 'Judul wajib diisi' })
   title: string;
 
+  @IsOptional()
+  @IsString()
+  titleEn?: string;
+
   @IsArray()
   @ArrayNotEmpty({ message: 'Minimal satu penulis' })
   authors: string[];
@@ -60,6 +64,10 @@ export class CreateDocumentDto {
   @IsOptional()
   @IsString()
   abstract?: string;
+
+  @IsOptional()
+  @IsString()
+  abstractEn?: string;
 
   @IsOptional()
   @IsString()

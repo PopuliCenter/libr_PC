@@ -3,29 +3,11 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../../components/AuthContext';
+import { useLang } from '../../../components/LanguageContext';
 import CiteBox from '../../../components/CiteBox';
 import RelatedMedia from '../../../components/RelatedMedia';
 import { api, Availability, DocumentItem, Recommendation } from '../../../lib/api';
-
-const BASIS_HINT: Record<string, string> = {
-  coread: 'Dibaca bersama',
-  category: 'Topik serupa',
-  recent: 'Terbitan terbaru',
-};
-
-const ACCESS_INFO: Record<string, string> = {
-  OPEN: 'Koleksi terbuka — dapat dibaca semua anggota setelah masuk.',
-  MEMBER: 'Koleksi ini dapat dibaca setelah masuk sebagai anggota.',
-  LOAN: 'Koleksi ini perlu dipinjam terlebih dahulu (akses berbatas waktu).',
-  INTERNAL: 'Koleksi internal — akses terbatas untuk peneliti internal Populi.',
-};
-
-const ACCESS_BADGE: Record<string, string> = {
-  OPEN: 'Terbuka',
-  MEMBER: 'Anggota',
-  LOAN: 'Sewa',
-  INTERNAL: 'Internal',
-};
+import { docAbstract, docTitle } from '../../../lib/i18n';
 
 export default function DocumentDetailClient({
   initialDoc,
@@ -35,6 +17,7 @@ export default function DocumentDetailClient({
   slug?: string;
 }) {
   const { user, loading: authLoading } = useAuth();
+  const { lang, t } = useLang();
   const [doc, setDoc] = useState<DocumentItem | null>(initialDoc ?? null);
   const [notFound, setNotFound] = useState(false);
   const [avail, setAvail] = useState<Availability | null>(null);
@@ -96,7 +79,7 @@ export default function DocumentDetailClient({
   if (!doc) {
     return (
       <div className="container page">
-        <p>Memuat…</p>
+        <p>{t('loading')}</p>
       </div>
     );
   }
@@ -125,11 +108,11 @@ export default function DocumentDetailClient({
       <div className="detail-head">
         <div>
           <span className={`badge ${doc.accessType.toLowerCase()}`}>
-            {ACCESS_BADGE[doc.accessType] ?? doc.accessType}
+            {t(doc.accessType)}
           </span>{' '}
           <span className="badge type">{doc.collectionType}</span>
         </div>
-        <h1 className="page-title">{doc.title}</h1>
+        <h1 className="page-title">{docTitle(doc, lang)}</h1>
         <div className="page-sub">
           {doc.authors.join(', ')}
           {doc.year ? ` · ${doc.year}` : ''}
@@ -140,26 +123,23 @@ export default function DocumentDetailClient({
 
       <div className="card" style={{ marginBottom: 20 }}>
         <div className="alert info" style={{ marginBottom: 16 }}>
-          {isMultimedia
-            ? 'Koleksi multimedia — tonton/dengarkan pada pemutar di bawah.'
-            : ACCESS_INFO[doc.accessType]}
-          {!isMultimedia && !doc.hasDigitalCopy &&
-            ' Versi digital koleksi ini belum tersedia — hubungi pustakawan.'}
+          {isMultimedia ? t('multimediaNote') : t(`accessInfo_${doc.accessType}`)}
+          {!isMultimedia && !doc.hasDigitalCopy && t('digitalUnavailable')}
         </div>
 
         <div
           style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}
         >
           {doc.hasDigitalCopy && !user && (
-            <Link className="btn" href="/masuk">Masuk untuk membaca</Link>
+            <Link className="btn" href="/masuk">{t('signinToRead')}</Link>
           )}
 
           {doc.hasDigitalCopy && user && doc.accessType !== 'LOAN' && (
-            <Link className="btn" href={`/baca/${doc.slug}`}>📖 Baca Online</Link>
+            <Link className="btn" href={`/baca/${doc.slug}`}>{t('readOnline')}</Link>
           )}
 
           {doc.hasDigitalCopy && user && doc.accessType === 'LOAN' && isStaff && (
-            <Link className="btn" href={`/baca/${doc.slug}`}>📖 Baca Online (staf)</Link>
+            <Link className="btn" href={`/baca/${doc.slug}`}>{t('readOnline')}</Link>
           )}
 
           <CiteBox doc={doc} />
@@ -211,21 +191,21 @@ export default function DocumentDetailClient({
 
       <RelatedMedia links={doc.relatedLinks} />
 
-      {doc.abstract && (
+      {docAbstract(doc, lang) && (
         <section className="card" style={{ marginBottom: 20 }}>
-          <h2 style={{ fontSize: 16, marginBottom: 8 }}>Abstrak</h2>
-          <p style={{ fontSize: 14 }}>{doc.abstract}</p>
+          <h2 style={{ fontSize: 16, marginBottom: 8 }}>{t('abstract')}</h2>
+          <p style={{ fontSize: 14 }}>{docAbstract(doc, lang)}</p>
         </section>
       )}
 
       <section className="card">
-        <h2 style={{ fontSize: 16, marginBottom: 12 }}>Detail Koleksi</h2>
+        <h2 style={{ fontSize: 16, marginBottom: 12 }}>{t('details')}</h2>
         <dl className="detail-meta">
-          <dt>Penulis</dt>
+          <dt>{t('author')}</dt>
           <dd>{doc.authors.join('; ')}</dd>
-          <dt>Penerbit</dt>
+          <dt>{t('publisher')}</dt>
           <dd>{doc.publisher ?? '—'}</dd>
-          <dt>Tahun</dt>
+          <dt>{t('year')}</dt>
           <dd>{doc.year ?? '—'}</dd>
           {doc.doi && (
             <>
@@ -237,30 +217,30 @@ export default function DocumentDetailClient({
               </dd>
             </>
           )}
-          <dt>Tipe koleksi</dt>
+          <dt>{t('type')}</dt>
           <dd>{doc.collectionType}</dd>
-          <dt>Bahasa</dt>
+          <dt>{t('language')}</dt>
           <dd>{doc.language === 'id' ? 'Indonesia' : doc.language}</dd>
-          <dt>Kategori</dt>
+          <dt>{t('category')}</dt>
           <dd>{doc.category?.name ?? '—'}</dd>
-          <dt>Subjek</dt>
+          <dt>{t('subject')}</dt>
           <dd>{doc.subjects?.length ? doc.subjects.join(', ') : '—'}</dd>
-          <dt>Jumlah halaman</dt>
+          <dt>{t('pages')}</dt>
           <dd>{doc.pageCount ?? '—'}</dd>
-          <dt>No. panggil</dt>
+          <dt>{t('callNumber')}</dt>
           <dd>{doc.callNumber ?? '—'}</dd>
-          <dt>Eksemplar fisik</dt>
+          <dt>{t('physicalCopies')}</dt>
           <dd>
             {doc.physicalCopies > 0
-              ? `${doc.physicalCopies} eksemplar di perpustakaan`
-              : 'Hanya digital'}
+              ? `${doc.physicalCopies} ${t('physicalAt')}`
+              : t('digitalOnly')}
           </dd>
         </dl>
       </section>
 
       {recs.length > 0 && (
         <section className="card" style={{ marginTop: 20 }}>
-          <h2 style={{ fontSize: 16, marginBottom: 12 }}>Rekomendasi Bacaan</h2>
+          <h2 style={{ fontSize: 16, marginBottom: 12 }}>{t('recommendations')}</h2>
           <ul className="rec-list">
             {recs.map((r) => (
               <li key={r.slug}>
@@ -270,7 +250,7 @@ export default function DocumentDetailClient({
                     .filter(Boolean)
                     .join(' · ')}
                 </span>
-                <span className="rec-basis">{BASIS_HINT[r.basis] ?? ''}</span>
+                <span className="rec-basis">{t(`basis_${r.basis}`)}</span>
               </li>
             ))}
           </ul>

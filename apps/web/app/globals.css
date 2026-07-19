@@ -44,6 +44,12 @@ a:hover { text-decoration: underline; }
 .nav { display: flex; align-items: center; gap: 18px; font-size: 14px; }
 .nav a { color: var(--ink-soft); }
 .nav a:hover { color: var(--accent); text-decoration: none; }
+.lang-toggle {
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink-soft);
+  border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700;
+  cursor: pointer; letter-spacing: 0.03em;
+}
+.lang-toggle:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ===== Tombol & form ===== */
 .btn {

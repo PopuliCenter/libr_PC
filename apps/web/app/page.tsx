@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import DocumentCard from '../components/DocumentCard';
+import { useLang } from '../components/LanguageContext';
 import { api, DocumentItem, PagedResult } from '../lib/api';
 
 const TYPES = ['buku', 'laporan', 'jurnal', 'prosiding', 'dataset', 'lainnya'];
 
 export default function CatalogPage() {
+  const { t } = useLang();
   const [query, setQuery] = useState('');
   const [type, setType] = useState('');
   const [page, setPage] = useState(1);
@@ -50,37 +52,35 @@ export default function CatalogPage() {
 
   return (
     <div className="container page">
-      <h1 className="page-title">Katalog Koleksi</h1>
-      <p className="page-sub">
-        Telusuri publikasi, laporan riset, dan koleksi digital Populi Center.
-      </p>
+      <h1 className="page-title">{t('homeTitle')}</h1>
+      <p className="page-sub">{t('homeSub')}</p>
 
       <form className="searchbar" onSubmit={submit}>
         <input
           type="search"
-          placeholder="Cari judul, penulis, atau topik…"
+          placeholder={t('searchPlaceholder')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
         <select value={type} onChange={(e) => setType(e.target.value)}>
-          <option value="">Semua tipe</option>
-          {TYPES.map((t) => (
-            <option key={t} value={t}>
-              {t}
+          <option value="">{t('allTypes')}</option>
+          {TYPES.map((ty) => (
+            <option key={ty} value={ty}>
+              {ty}
             </option>
           ))}
         </select>
         <button className="btn" type="submit">
-          Cari
+          {t('searchBtn')}
         </button>
       </form>
 
       {error && <div className="alert error">{error}</div>}
-      {loading && <p>Memuat…</p>}
+      {loading && <p>{t('loading')}</p>}
 
       {result && !loading && (
         <>
-          <p className="page-sub">{result.meta.total} koleksi ditemukan</p>
+          <p className="page-sub">{result.meta.total} {t('found')}</p>
           <div className="doc-grid">
             {result.data.map((doc) => (
               <DocumentCard key={doc.id} doc={doc} />
@@ -93,17 +93,17 @@ export default function CatalogPage() {
                 disabled={page <= 1}
                 onClick={() => goTo(page - 1)}
               >
-                ‹ Sebelumnya
+                {t('prev')}
               </button>
               <span>
-                Hal. {page} / {result.meta.totalPages}
+                {t('pageLabel')} {page} / {result.meta.totalPages}
               </span>
               <button
                 className="btn secondary"
                 disabled={page >= result.meta.totalPages}
                 onClick={() => goTo(page + 1)}
               >
-                Berikutnya ›
+                {t('next')}
               </button>
             </div>
           )}
