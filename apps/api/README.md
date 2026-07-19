@@ -44,11 +44,12 @@ src/
 | `GET /.well-known/openid-configuration` · `GET /oauth/jwks` | publik | Discovery OIDC + kunci publik penandatangan (RS256) |
 | `GET /oauth/authorize/context` · `POST /oauth/authorize` | publik / member | Konteks consent (nama klien+scope) & penerbitan authorization code (butuh login perpustakaan) |
 | `POST /oauth/token` · `GET /oauth/userinfo` | publik | Tukar code→token (PKCE, authorization_code & refresh_token) & profil pengguna ter-scope |
-| `GET /documents?query=&category=&year=&type=` | publik | Pencarian katalog (hanya PUBLISHED) |
+| `GET /documents?query=&category=&year=&type=` | publik (auth opsional) | Pencarian katalog (hanya PUBLISHED; koleksi `INTERNAL` hanya tampil bila token peneliti internal disertakan) |
 | `GET /documents/:slug` | publik | Detail koleksi |
 | `GET /categories` | publik | Daftar kategori |
 | `POST/PATCH/DELETE /admin/documents` | librarian+ | CRUD koleksi (ter-audit); dukung `relatedLinks[]` (tautan acara/multimedia, PRD I4) & tipe `video`/`audio` |
 | `GET /admin/audit-logs` | superadmin | Query audit log |
+| `GET /admin/users` · `PATCH /admin/users/:id` | superadmin | Kelola pengguna: tandai peneliti **internal** (`isInternal`), ubah peran/status (PRD P1) |
 | `POST /loans` · `POST /loans/:id/return` · `GET /me/loans` | member | Sewa digital: kuota lisensi per koleksi, batas 3 pinjaman aktif, kedaluwarsa otomatis (lazy check + cron per menit) |
 | `GET /documents/:id/availability` | member | Ketersediaan + posisi antrian user (dipakai UI menentukan Pinjam/Antre/Klaim/Baca) |
 | `POST /holds` · `POST /holds/:id/claim` · `POST /holds/:id/cancel` · `GET /me/holds` | member | Antrian FIFO saat lisensi penuh; tawaran jendela klaim 24 jam (cron per menit) |

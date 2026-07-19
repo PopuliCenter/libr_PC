@@ -256,7 +256,7 @@ Arah besar: perpustakaan ini bukan sistem yang berdiri sendiri, melainkan **pint
 
 | # | Fitur | Nilai |
 |---|---|---|
-| P1 | **Koleksi internal (role-based)** — laporan klien/draft hanya untuk peneliti internal; e-library sekaligus jadi arsip pengetahuan lembaga | Satu sistem untuk publik & internal; tipe akses `INTERNAL` tinggal ditambahkan di enum yang ada |
+| P1 ✅ | **Koleksi internal (role-based)** — laporan klien/draft hanya untuk peneliti internal; e-library sekaligus jadi arsip pengetahuan lembaga | **Terimplementasi**: tipe akses `INTERNAL` + flag `user.isInternal`; koleksi internal disembunyikan dari katalog publik, detail (404), reader, **OAI harvest, RSS, & widget** — hanya peneliti internal (atau pustakawan/superadmin) yang melihatnya. Auth opsional pada katalog publik (satu katalog untuk semua). Superadmin menandai anggota internal via `/admin/pengguna`. |
 | P2 | **Pencarian semantik & tanya-jawab koleksi (RAG)** — pengguna bertanya "apa temuan Populi soal partisipasi pemilih muda?" → jawaban dengan rujukan halaman, dibaca di protected reader | Hasil OCR Fase 1 menjadi bahan baku langsung; pembeda kuat dibanding perpustakaan lain |
 | P3 | **Rekomendasi bacaan** — "yang membaca ini juga membaca…" dari data `reading_events` |
 | P4 | **Multibahasa (ID/EN)** — katalog & metadata dwibahasa untuk audiens internasional/funder |

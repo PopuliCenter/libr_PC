@@ -69,7 +69,7 @@ export class CreateDocumentDto {
   categoryId?: string;
 
   @IsOptional()
-  @IsIn(['OPEN', 'MEMBER', 'LOAN'])
+  @IsIn(['OPEN', 'MEMBER', 'LOAN', 'INTERNAL'])
   accessType?: AccessType;
 
   @IsOptional()

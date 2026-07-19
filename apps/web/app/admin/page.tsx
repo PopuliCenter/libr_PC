@@ -114,6 +114,9 @@ export default function AdminPage() {
           <p className="page-sub">Tambah dan kelola koleksi perpustakaan.</p>
         </div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {user?.role === 'superadmin' && (
+            <Link href="/admin/pengguna" className="btn secondary">👤 Pengguna</Link>
+          )}
           <Link href="/admin/analitik" className="btn secondary">📈 Analitik</Link>
           <Link href="/admin/inventaris" className="btn secondary">📷 Inventaris Fisik</Link>
           <Link href="/admin/impor" className="btn">📦 Impor Massal</Link>
@@ -176,6 +179,7 @@ export default function AdminPage() {
                 <option value="OPEN">Terbuka</option>
                 <option value="MEMBER">Anggota</option>
                 <option value="LOAN">Sewa</option>
+                <option value="INTERNAL">Internal</option>
               </select>
             </div>
             <div className="field">

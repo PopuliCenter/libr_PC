@@ -11,15 +11,26 @@ const ACCESS_INFO: Record<string, string> = {
   OPEN: 'Koleksi terbuka — dapat dibaca semua anggota setelah masuk.',
   MEMBER: 'Koleksi ini dapat dibaca setelah masuk sebagai anggota.',
   LOAN: 'Koleksi ini perlu dipinjam terlebih dahulu (akses berbatas waktu).',
+  INTERNAL: 'Koleksi internal — akses terbatas untuk peneliti internal Populi.',
+};
+
+const ACCESS_BADGE: Record<string, string> = {
+  OPEN: 'Terbuka',
+  MEMBER: 'Anggota',
+  LOAN: 'Sewa',
+  INTERNAL: 'Internal',
 };
 
 export default function DocumentDetailClient({
   initialDoc,
+  slug,
 }: {
-  initialDoc: DocumentItem;
+  initialDoc?: DocumentItem;
+  slug?: string;
 }) {
-  const { user } = useAuth();
-  const [doc] = useState<DocumentItem>(initialDoc);
+  const { user, loading: authLoading } = useAuth();
+  const [doc, setDoc] = useState<DocumentItem | null>(initialDoc ?? null);
+  const [notFound, setNotFound] = useState(false);
   const [avail, setAvail] = useState<Availability | null>(null);
   const [duration, setDuration] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
@@ -39,11 +50,44 @@ export default function DocumentDetailClient({
     [user],
   );
 
+  // Bila SSR tak menemukan dokumen (mis. koleksi INTERNAL yang di-fetch anonim
+  // di server), coba ambil di klien dengan token — hanya peneliti internal yang
+  // berhasil; selain itu tampil pesan tak ditemukan.
   useEffect(() => {
-    if (doc.accessType === 'LOAN') refreshAvail(doc.id);
+    if (initialDoc || !slug || authLoading) return;
+    let active = true;
+    api
+      .get<DocumentItem>(`/documents/${slug}`)
+      .then((d) => active && setDoc(d))
+      .catch(() => active && setNotFound(true));
+    return () => {
+      active = false;
+    };
+  }, [initialDoc, slug, authLoading]);
+
+  useEffect(() => {
+    if (doc?.accessType === 'LOAN') refreshAvail(doc.id);
   }, [doc, refreshAvail]);
 
+  if (notFound) {
+    return (
+      <div className="container page">
+        <div className="alert error">
+          Koleksi tidak ditemukan atau Anda tidak memiliki akses.
+        </div>
+      </div>
+    );
+  }
+  if (!doc) {
+    return (
+      <div className="container page">
+        <p>Memuat…</p>
+      </div>
+    );
+  }
+
   async function action(fn: () => Promise<unknown>, successText: string) {
+    if (!doc) return;
     setBusy(true);
     setNotice(null);
     try {
@@ -66,11 +110,7 @@ export default function DocumentDetailClient({
       <div className="detail-head">
         <div>
           <span className={`badge ${doc.accessType.toLowerCase()}`}>
-            {doc.accessType === 'OPEN'
-              ? 'Terbuka'
-              : doc.accessType === 'MEMBER'
-                ? 'Anggota'
-                : 'Sewa'}
+            {ACCESS_BADGE[doc.accessType] ?? doc.accessType}
           </span>{' '}
           <span className="badge type">{doc.collectionType}</span>
         </div>

@@ -37,11 +37,20 @@ export class DocumentsService {
     private readonly events: EventEmitter2,
   ) {}
 
-  /** Pencarian katalog publik — hanya koleksi PUBLISHED. */
-  async search(query: QueryDocumentsDto): Promise<PagedResult<Document>> {
+  /**
+   * Pencarian katalog publik — hanya koleksi PUBLISHED. Koleksi INTERNAL
+   * disembunyikan kecuali `includeInternal` (peneliti internal / staf).
+   */
+  async search(
+    query: QueryDocumentsDto,
+    opts: { includeInternal?: boolean } = {},
+  ): Promise<PagedResult<Document>> {
     const qb = this.baseQuery().andWhere('doc.status = :status', {
       status: 'PUBLISHED',
     });
+    if (!opts.includeInternal) {
+      qb.andWhere('doc.accessType != :internal', { internal: 'INTERNAL' });
+    }
     this.applyFilters(qb, query);
 
     const [data, total] = await qb
@@ -193,9 +202,10 @@ export class DocumentsService {
     offset: number,
     limit: number,
   ): Promise<[Document[], number]> {
-    const qb = this.baseQuery().andWhere('doc.status = :status', {
-      status: 'PUBLISHED',
-    });
+    const qb = this.baseQuery()
+      .andWhere('doc.status = :status', { status: 'PUBLISHED' })
+      // Koleksi INTERNAL tak pernah di-harvest ke jejaring nasional (PRD P1).
+      .andWhere('doc.accessType != :internal', { internal: 'INTERNAL' });
     if (from) qb.andWhere('doc.updatedAt >= :from', { from });
     if (until) qb.andWhere('doc.updatedAt <= :until', { until });
     return qb

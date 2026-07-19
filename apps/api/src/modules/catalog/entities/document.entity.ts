@@ -10,7 +10,7 @@ import {
 import { DATETIME } from '../../../database/column-types';
 import { Category } from './category.entity';
 
-export type AccessType = 'OPEN' | 'MEMBER' | 'LOAN';
+export type AccessType = 'OPEN' | 'MEMBER' | 'LOAN' | 'INTERNAL';
 export type DocumentStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 export type CollectionType =
   | 'buku'

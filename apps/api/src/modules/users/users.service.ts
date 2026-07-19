@@ -22,6 +22,16 @@ export class UsersService {
     return this.repo.findOne({ where: { googleId } });
   }
 
+  /** Cari pengguna untuk admin (email/nama). Maks 100 terbaru. */
+  search(query?: string): Promise<User[]> {
+    const qb = this.repo.createQueryBuilder('u').orderBy('u.createdAt', 'DESC').take(100);
+    if (query?.trim()) {
+      const like = `%${query.trim().toLowerCase()}%`;
+      qb.where('LOWER(u.email) LIKE :like OR LOWER(u.name) LIKE :like', { like });
+    }
+    return qb.getMany();
+  }
+
   /**
    * Anggota aktif yang setuju newsletter dan minatnya beririsan dengan `topics`.
    * `interests` disimpan sebagai JSON teks (portabel SQLite/PostgreSQL), maka

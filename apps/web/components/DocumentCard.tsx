@@ -5,6 +5,7 @@ const ACCESS_LABEL: Record<string, { text: string; cls: string }> = {
   OPEN: { text: 'Terbuka', cls: 'open' },
   MEMBER: { text: 'Anggota', cls: 'member' },
   LOAN: { text: 'Sewa', cls: 'loan' },
+  INTERNAL: { text: 'Internal', cls: 'internal' },
 };
 
 export default function DocumentCard({ doc }: { doc: DocumentItem }) {

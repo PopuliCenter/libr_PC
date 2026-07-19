@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
 import { API_URL, DocumentItem } from '../../../lib/api';
 import { citationMeta } from '../../../lib/citations';
 import DocumentDetailClient from './DocumentDetailClient';
@@ -46,6 +45,8 @@ export default async function DocumentDetailPage({
 }) {
   const { slug } = await params;
   const doc = await getDoc(slug);
-  if (!doc) notFound();
-  return <DocumentDetailClient initialDoc={doc} />;
+  // Fetch server tak berautentikasi: koleksi INTERNAL akan null di sini. Serahkan
+  // ke klien (yang membawa token) alih-alih 404 langsung.
+  if (doc) return <DocumentDetailClient initialDoc={doc} />;
+  return <DocumentDetailClient slug={slug} />;
 }

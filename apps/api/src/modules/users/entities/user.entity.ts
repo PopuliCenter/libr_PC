@@ -46,6 +46,10 @@ export class User {
   @Column({ type: 'simple-json', default: '[]' })
   interests: string[];
 
+  /** Peneliti/staf internal Populi — boleh mengakses koleksi INTERNAL (PRD P1). */
+  @Column({ type: 'boolean', default: false })
+  isInternal: boolean;
+
   /** Persetujuan menerima notifikasi terbitan baru (non-transaksional, UU PDP). */
   @Column({ type: 'boolean', default: false })
   newsletterConsent: boolean;

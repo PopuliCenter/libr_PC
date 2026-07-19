@@ -101,6 +101,7 @@ a:hover { text-decoration: underline; }
 .badge.open { background: #e5f5ec; color: var(--ok); }
 .badge.member { background: var(--accent-soft); color: var(--accent); }
 .badge.loan { background: #fdf1e2; color: var(--warn); }
+.badge.internal { background: #efe7fb; color: #6b3fa0; }
 .badge.type { background: #f1f3f7; color: var(--ink-soft); font-weight: 500; }
 
 .searchbar { display: flex; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; }

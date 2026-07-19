@@ -217,6 +217,18 @@ export interface UserProfile {
   phone: string | null;
   interests: string[];
   newsletterConsent: boolean;
+  isInternal: boolean;
+}
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: 'member' | 'librarian' | 'superadmin';
+  status: string;
+  institution: string | null;
+  isInternal: boolean;
+  createdAt: string;
 }
 
 // ===== Penyimpanan token =====

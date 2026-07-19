@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { hasInternalAccess } from '../../common/access';
 import { DocumentsService } from '../catalog/documents.service';
 import { LoansService } from '../loans/loans.service';
 import { User } from '../users/entities/user.entity';
@@ -32,6 +33,11 @@ export class ReaderService {
     }
     if (!doc.masterObjectKey) {
       throw new BadRequestException('Versi digital koleksi ini belum tersedia');
+    }
+    if (doc.accessType === 'INTERNAL' && !hasInternalAccess(user)) {
+      throw new ForbiddenException(
+        'Koleksi internal — akses terbatas untuk peneliti internal Populi',
+      );
     }
 
     let loanId: string | null = null;
@@ -78,6 +84,9 @@ export class ReaderService {
 
     if (!doc.masterObjectKey || doc.status !== 'PUBLISHED') {
       throw new NotFoundException('Koleksi tidak tersedia');
+    }
+    if (doc.accessType === 'INTERNAL' && !hasInternalAccess(user)) {
+      throw new ForbiddenException('Koleksi internal — akses terbatas');
     }
     if (pageNo < 1 || (doc.pageCount && pageNo > doc.pageCount)) {
       throw new BadRequestException('Nomor halaman di luar jangkauan');

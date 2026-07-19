@@ -154,6 +154,10 @@ export class OaiService {
     }
     try {
       const doc = await this.documentsService.findBySlug(slug);
+      // Koleksi INTERNAL tak pernah diekspos ke harvester (PRD P1).
+      if (doc.accessType === 'INTERNAL') {
+        throw new Error('internal');
+      }
       return this.respond(
         { verb: 'GetRecord', identifier: params.identifier, metadataPrefix: METADATA_PREFIX },
         tag('GetRecord', this.recordXml(doc)),
