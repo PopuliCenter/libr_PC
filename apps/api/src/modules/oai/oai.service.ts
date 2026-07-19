@@ -191,6 +191,7 @@ export class OaiService {
       tag('dc:type', xmlEscape(doc.collectionType)),
       tag('dc:language', xmlEscape(doc.language)),
       doc.isbnIssn ? tag('dc:identifier', xmlEscape(doc.isbnIssn)) : '',
+      doc.doi ? tag('dc:identifier', xmlEscape(`https://doi.org/${doc.doi}`)) : '',
       tag('dc:identifier', xmlEscape(this.landingPageUrl(doc))),
       tag('dc:rights', xmlEscape(this.rightsLabel(doc))),
     ]

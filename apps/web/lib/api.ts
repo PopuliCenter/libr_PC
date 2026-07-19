@@ -26,6 +26,7 @@ export interface DocumentItem {
   language: string;
   abstract: string | null;
   subjects: string[];
+  doi: string | null;
   relatedLinks: RelatedLink[];
   category: Category | null;
   accessType: 'OPEN' | 'MEMBER' | 'LOAN';

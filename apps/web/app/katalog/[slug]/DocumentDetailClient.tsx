@@ -227,6 +227,16 @@ export default function DocumentDetailClient({
           <dd>{doc.publisher ?? '—'}</dd>
           <dt>Tahun</dt>
           <dd>{doc.year ?? '—'}</dd>
+          {doc.doi && (
+            <>
+              <dt>DOI</dt>
+              <dd>
+                <a href={`https://doi.org/${doc.doi}`} target="_blank" rel="noopener noreferrer">
+                  {doc.doi}
+                </a>
+              </dd>
+            </>
+          )}
           <dt>Tipe koleksi</dt>
           <dd>{doc.collectionType}</dd>
           <dt>Bahasa</dt>

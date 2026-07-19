@@ -15,7 +15,10 @@ export interface CitableDoc {
   collectionType: string;
   language?: string;
   subjects?: string[];
+  doi?: string | null;
 }
+
+const doiUrl = (doi?: string | null) => (doi ? `https://doi.org/${doi}` : '');
 
 const orDash = (s: string | null | undefined) => (s && s.trim() ? s.trim() : '');
 
@@ -40,7 +43,7 @@ export function formatApa(doc: CitableDoc): string {
   const publisher = orDash(doc.publisher);
   const lead = authors ? `${authors} ${year}.` : `${title.replace(/\.$/, '')} ${year}.`;
   const body = authors ? `${title} ${publisher ? publisher + '.' : ''}` : `${publisher ? publisher + '.' : ''}`;
-  return tidy(`${lead} ${body}`);
+  return tidy(`${lead} ${body} ${doiUrl(doc.doi)}`);
 }
 
 export function formatChicago(doc: CitableDoc): string {
@@ -49,7 +52,7 @@ export function formatChicago(doc: CitableDoc): string {
   const publisher = orDash(doc.publisher);
   const tail = [publisher, doc.year ? String(doc.year) : ''].filter(Boolean).join(', ');
   const lead = authors ? `${authors}. ` : '';
-  return tidy(`${lead}${title}. ${tail}.`);
+  return tidy(`${lead}${title}. ${tail}. ${doiUrl(doc.doi)}`);
 }
 
 const BIBTEX_TYPE: Record<string, string> = {
@@ -78,6 +81,7 @@ export function formatBibtex(doc: CitableDoc): string {
     ['title', doc.title],
     ['year', doc.year ? String(doc.year) : ''],
     [publisherField, orDash(doc.publisher)],
+    ['doi', doc.doi ?? ''],
   ];
   const body = fields
     .filter(([, v]) => v)
@@ -113,6 +117,7 @@ export function citationMeta(doc: CitableDoc): Record<string, string | string[]>
   if (authors.length) meta.citation_author = authors;
   if (doc.year) meta.citation_publication_date = String(doc.year);
   if (orDash(doc.publisher)) meta.citation_publisher = doc.publisher as string;
+  if (doc.doi) meta.citation_doi = doc.doi;
   if (doc.language) meta.citation_language = doc.language;
   if (doc.subjects?.length) meta.citation_keywords = doc.subjects.join('; ');
   return meta;

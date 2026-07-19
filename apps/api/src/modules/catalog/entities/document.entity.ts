@@ -66,6 +66,10 @@ export class Document {
   @Column({ type: 'varchar', nullable: true })
   isbnIssn: string | null;
 
+  /** DOI publikasi (mis. 10.1234/abc) — sitasi permanen (PRD I10). */
+  @Column({ type: 'varchar', nullable: true })
+  doi: string | null;
+
   @Column({ type: 'varchar', default: 'buku' })
   collectionType: CollectionType;
 

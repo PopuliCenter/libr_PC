@@ -250,7 +250,7 @@ Arah besar: perpustakaan ini bukan sistem yang berdiri sendiri, melainkan **pint
 |---|---|---|---|
 | I8 | **Indonesia OneSearch (Perpusnas) via OAI-PMH** — katalog ter-harvest otomatis ke jejaring perpustakaan nasional | Ditemukan oleh seluruh pemustaka Indonesia | Endpoint OAI-PMH (metadata sudah Dublin Core–compatible sejak Fase 1 — memang disiapkan untuk ini) |
 | I9 ✅ | **Sitasi siap pakai** — tombol "Kutip" (APA/Chicago/BibTeX) di tiap halaman detail; metadata Google Scholar (`citation_*` meta tags) | Memudahkan akademisi mengutip; naik di Scholar | **Terimplementasi**: komponen Kutip (`CiteBox`) + `lib/citations.ts`; halaman detail jadi server component dengan `generateMetadata` yang merender `citation_*` di server (terindeks Scholar). |
-| I10 | **DOI untuk publikasi resmi** (Crossref/DataCite) | Publikasi tersitasi permanen, terlacak | Keanggotaan Crossref; field `doi` per dokumen |
+| I10 ✅* | **DOI untuk publikasi resmi** (Crossref/DataCite) | Publikasi tersitasi permanen, terlacak | **Terimplementasi (field + propagasi)**: `documents.doi` (normalisasi URL→DOI, validasi pola `10.xxxx/suffix`); ditampilkan sbg tautan di detail & disebar ke sitasi APA/Chicago/BibTeX, meta Google Scholar `citation_doi`, OAI-PMH `dc:identifier`, & RSS. **\*Belum:** registrasi/deposit DOI otomatis ke Crossref/DataCite (butuh keanggotaan + kredensial) — DOI dimasukkan manual oleh admin. |
 
 ### 9.3 Penyempurnaan produk
 

@@ -13,6 +13,7 @@ const EMPTY_FORM = {
   accessType: 'MEMBER',
   abstract: '',
   status: 'PUBLISHED',
+  doi: '',
 };
 
 const LINK_KINDS = ['video', 'podcast', 'news', 'slides', 'dataset', 'event', 'other'];
@@ -77,6 +78,7 @@ export default function AdminPage() {
         accessType: form.accessType,
         abstract: form.abstract || undefined,
         status: form.status,
+        doi: form.doi.trim() || undefined,
         relatedLinks: links
           .filter((l) => l.url.trim())
           .map((l) => ({
@@ -192,6 +194,14 @@ export default function AdminPage() {
                 <option value="DRAFT">Draft</option>
               </select>
             </div>
+          </div>
+          <div className="field">
+            <label>DOI (opsional, mis. 10.1234/abcd)</label>
+            <input
+              value={form.doi}
+              placeholder="10.xxxx/xxxx atau tempel URL doi.org"
+              onChange={(e) => setForm({ ...form, doi: e.target.value })}
+            />
           </div>
           <div className="field">
             <label>Abstrak</label>

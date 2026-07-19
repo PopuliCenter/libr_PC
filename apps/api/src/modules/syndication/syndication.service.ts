@@ -142,6 +142,7 @@ export class SyndicationService {
       tag('pubDate', rfc822(doc.createdAt)) +
       (doc.category ? tag('category', xmlEscape(doc.category.name)) : '') +
       (doc.authors ?? []).map((a) => tag('dc:creator', xmlEscape(a))).join('') +
+      (doc.doi ? tag('dc:identifier', xmlEscape(`https://doi.org/${doc.doi}`)) : '') +
       tag('description', xmlEscape(desc)) +
       `</item>`
     );

@@ -48,7 +48,7 @@ src/
 | `GET /documents/:slug` | publik | Detail koleksi |
 | `GET /documents/:id/recommendations` | publik | Rekomendasi bacaan "yang membaca ini juga membaca…" (PRD P3; co-read + fallback kategori/terbaru, INTERNAL dikecualikan) |
 | `GET /categories` | publik | Daftar kategori |
-| `POST/PATCH/DELETE /admin/documents` | librarian+ | CRUD koleksi (ter-audit); dukung `relatedLinks[]` (tautan acara/multimedia, PRD I4) & tipe `video`/`audio` |
+| `POST/PATCH/DELETE /admin/documents` | librarian+ | CRUD koleksi (ter-audit); dukung `relatedLinks[]` (I4), tipe `video`/`audio`, & `doi` (I10; disebar ke sitasi, `citation_doi`, OAI & RSS) |
 | `GET /admin/audit-logs` | superadmin | Query audit log |
 | `GET /admin/users` · `PATCH /admin/users/:id` | superadmin | Kelola pengguna: tandai peneliti **internal** (`isInternal`), ubah peran/status (PRD P1) |
 | `POST /loans` · `POST /loans/:id/return` · `GET /me/loans` | member | Sewa digital: kuota lisensi per koleksi, batas 3 pinjaman aktif, kedaluwarsa otomatis (lazy check + cron per menit) |

@@ -1,4 +1,4 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
   IsArray,
@@ -7,6 +7,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Matches,
   Min,
   ValidateNested,
 } from 'class-validator';
@@ -37,6 +38,16 @@ export class CreateDocumentDto {
   @IsOptional()
   @IsString()
   isbnIssn?: string;
+
+  /** DOI — prefiks doi.org/ atau doi: dinormalisasi; validasi pola 10.xxxx/suffix. */
+  @IsOptional()
+  @Transform(({ value }) =>
+    typeof value === 'string'
+      ? value.trim().replace(/^https?:\/\/(dx\.)?doi\.org\//i, '').replace(/^doi:/i, '').trim()
+      : value,
+  )
+  @Matches(/^10\.\d{2,9}\/\S+$/, { message: 'Format DOI tidak valid (mis. 10.1234/abcd)' })
+  doi?: string;
 
   @IsOptional()
   @IsIn(['buku', 'laporan', 'jurnal', 'prosiding', 'dataset', 'video', 'audio', 'lainnya'])
