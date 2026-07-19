@@ -129,6 +129,23 @@ export interface AuthorizationContext {
   scopes: { key: string; label: string }[];
 }
 
+export interface PublicImpact {
+  generatedAt: string;
+  totals: {
+    publications: number;
+    reads: number;
+    members: number;
+    categories: number;
+    loans: number;
+  };
+  topPublic: {
+    title: string;
+    slug: string;
+    category: string | null;
+    reads: number;
+  }[];
+}
+
 export interface AnalyticsDashboard {
   window: { days: number; since: string | null; generatedAt: string };
   overview: {

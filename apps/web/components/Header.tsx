@@ -17,6 +17,7 @@ export default function Header() {
         </Link>
         <nav className="nav">
           <Link href="/">Katalog</Link>
+          <Link href="/dampak">Dampak</Link>
           {user ? (
             <>
               {(user.role === 'librarian' || user.role === 'superadmin') && (

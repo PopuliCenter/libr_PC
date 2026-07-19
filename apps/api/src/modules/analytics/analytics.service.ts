@@ -138,6 +138,50 @@ export class AnalyticsService {
     };
   }
 
+  /**
+   * Statistik dampak PUBLIK (PRD P6) — agregat aman untuk halaman akuntabilitas.
+   * Tanpa PII/segmen; koleksi INTERNAL dikecualikan dari hitungan & "paling dibaca".
+   */
+  async publicImpact() {
+    const [sessions, docs, activeMembers, loans] = await Promise.all([
+      this.sessions.find({ order: { createdAt: 'DESC' }, take: SESSION_CAP }),
+      this.documents.find(),
+      this.users.count({ where: { status: 'active' } }),
+      this.loans.count(),
+    ]);
+
+    const publicDocs = docs.filter(
+      (d) => d.status === 'PUBLISHED' && d.accessType !== 'INTERNAL',
+    );
+    const publicIds = new Set(publicDocs.map((d) => d.id));
+    const docById = new Map(publicDocs.map((d) => [d.id, d]));
+    const publicReads = sessions.filter((s) => publicIds.has(s.documentId));
+
+    const topPublic = [...tally(publicReads.map((s) => s.documentId)).entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([id, reads]) => {
+        const d = docById.get(id)!;
+        return { title: d.title, slug: d.slug, category: d.category?.name ?? null, reads };
+      });
+
+    const categories = new Set(
+      publicDocs.map((d) => d.category?.name).filter((n): n is string => !!n),
+    ).size;
+
+    return {
+      generatedAt: new Date().toISOString(),
+      totals: {
+        publications: publicDocs.length,
+        reads: publicReads.length,
+        members: activeMembers,
+        categories,
+        loans,
+      },
+      topPublic,
+    };
+  }
+
   /** Tren pembacaan: harian bila rentang ≤ 45 hari, selain itu bulanan. */
   private trend(sessions: ReadingSession[], days: number): Dashboard['trend'] {
     const daily = days > 0 && days <= 45;

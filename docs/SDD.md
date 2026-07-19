@@ -209,6 +209,7 @@ Modul `analytics/` = **lapisan dasbor read-only** di atas data Fase 1 — **tanp
 - **Endpoint** (`/admin/analytics`, `@Roles('librarian','superadmin')`): `?days=` (0=semua) → `{overview, topDocuments, byInstitution, byCategory, trend}`; `report.xlsx` mengekspor 5 sheet (Ringkasan/Publikasi/Institusi/Topik/Tren).
 - **Agregasi di aplikasi**, bukan SQL `GROUP BY` + filter tanggal — sengaja, untuk portabilitas SQLite/PostgreSQL dan menghindari perbedaan format datetime antar-driver (pernah menimbulkan bug di antrian). Baris diambil dgn cap (skala Fase 1); bila membesar → SQL/materialized view.
 - **Tren**: harian (isi hari kosong dgn 0) bila rentang ≤ 45 hari, selain itu bulanan (≤ 12 bucket).
+- **Dampak publik (PRD P6)**: `GET /impact` (@Public, cache 10 mnt) memakai `AnalyticsService.publicImpact()` — agregat **aman** (publikasi, kali dibaca, anggota, bidang topik, peminjaman + 6 koleksi paling dibaca). **Koleksi INTERNAL & PII/segmen dikecualikan** (reads dihitung hanya untuk koleksi publik). Halaman `/dampak` adalah **server component** (SSR, terindeks) — alat akuntabilitas ke publik/funder. "Unduhan data" & "sitasi" tak ditampilkan karena belum dilacak.
 - **Catatan kejujuran vs PRD**: PRD menyebut tabel `reading_events` & segmen "wilayah"; keduanya belum ada. Sinyal baca nyata memakai `reading_sessions`; segmen "wilayah" butuh field `region` pada user (belum dikumpulkan saat registrasi). Frontend: `/admin/analitik` — KPI, tabel, bar CSS (tanpa pustaka chart), selektor rentang, unduh xlsx.
 
 ### 2.11 Sindikasi ke situs utama (PRD I3)

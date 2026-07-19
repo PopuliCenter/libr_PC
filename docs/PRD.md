@@ -261,7 +261,7 @@ Arah besar: perpustakaan ini bukan sistem yang berdiri sendiri, melainkan **pint
 | P3 | **Rekomendasi bacaan** — "yang membaca ini juga membaca…" dari data `reading_events` |
 | P4 | **Multibahasa (ID/EN)** — katalog & metadata dwibahasa untuk audiens internasional/funder |
 | P5 | **Anotasi pribadi** — anggota menandai halaman & mencatat (tersimpan per akun, bukan di file — DRM tetap utuh) |
-| P6 | **Statistik publik** — halaman "dampak" (jumlah baca, unduhan data, sitasi) sebagai alat akuntabilitas lembaga |
+| P6 ✅ | **Statistik publik** — halaman "dampak" (jumlah baca, unduhan data, sitasi) sebagai alat akuntabilitas lembaga. **Terimplementasi**: `GET /impact` (agregat aman, tanpa PII/segmen, INTERNAL dikecualikan) + halaman publik `/dampak` (SSR): publikasi, kali dibaca, anggota, bidang topik, peminjaman + koleksi paling dibaca. **Catatan:** "unduhan data" & "sitasi" belum dilacak (protected reader tanpa unduh; klik tombol Kutip belum direkam) — jadi tak ditampilkan agar tak menyesatkan. |
 
 ### 9.4 Urutan yang disarankan
 
