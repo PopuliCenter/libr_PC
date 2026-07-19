@@ -129,6 +129,17 @@ export interface AuthorizationContext {
   scopes: { key: string; label: string }[];
 }
 
+export interface Recommendation {
+  title: string;
+  slug: string;
+  authors: string[];
+  year: number | null;
+  collectionType: string;
+  category: string | null;
+  basis: 'coread' | 'category' | 'recent';
+  coReads: number;
+}
+
 export interface PublicImpact {
   generatedAt: string;
   totals: {

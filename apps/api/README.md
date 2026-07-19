@@ -46,6 +46,7 @@ src/
 | `POST /oauth/token` · `GET /oauth/userinfo` | publik | Tukar code→token (PKCE, authorization_code & refresh_token) & profil pengguna ter-scope |
 | `GET /documents?query=&category=&year=&type=` | publik (auth opsional) | Pencarian katalog (hanya PUBLISHED; koleksi `INTERNAL` hanya tampil bila token peneliti internal disertakan) |
 | `GET /documents/:slug` | publik | Detail koleksi |
+| `GET /documents/:id/recommendations` | publik | Rekomendasi bacaan "yang membaca ini juga membaca…" (PRD P3; co-read + fallback kategori/terbaru, INTERNAL dikecualikan) |
 | `GET /categories` | publik | Daftar kategori |
 | `POST/PATCH/DELETE /admin/documents` | librarian+ | CRUD koleksi (ter-audit); dukung `relatedLinks[]` (tautan acara/multimedia, PRD I4) & tipe `video`/`audio` |
 | `GET /admin/audit-logs` | superadmin | Query audit log |

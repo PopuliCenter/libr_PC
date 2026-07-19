@@ -5,7 +5,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../../components/AuthContext';
 import CiteBox from '../../../components/CiteBox';
 import RelatedMedia from '../../../components/RelatedMedia';
-import { api, Availability, DocumentItem } from '../../../lib/api';
+import { api, Availability, DocumentItem, Recommendation } from '../../../lib/api';
+
+const BASIS_HINT: Record<string, string> = {
+  coread: 'Dibaca bersama',
+  category: 'Topik serupa',
+  recent: 'Terbitan terbaru',
+};
 
 const ACCESS_INFO: Record<string, string> = {
   OPEN: 'Koleksi terbuka — dapat dibaca semua anggota setelah masuk.',
@@ -35,6 +41,7 @@ export default function DocumentDetailClient({
   const [duration, setDuration] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<{ kind: string; text: string } | null>(null);
+  const [recs, setRecs] = useState<Recommendation[]>([]);
 
   const refreshAvail = useCallback(
     async (docId: string) => {
@@ -68,6 +75,14 @@ export default function DocumentDetailClient({
   useEffect(() => {
     if (doc?.accessType === 'LOAN') refreshAvail(doc.id);
   }, [doc, refreshAvail]);
+
+  useEffect(() => {
+    if (!doc) return;
+    api
+      .get<Recommendation[]>(`/documents/${doc.id}/recommendations?limit=5`)
+      .then(setRecs)
+      .catch(() => setRecs([]));
+  }, [doc]);
 
   if (notFound) {
     return (
@@ -232,6 +247,25 @@ export default function DocumentDetailClient({
           </dd>
         </dl>
       </section>
+
+      {recs.length > 0 && (
+        <section className="card" style={{ marginTop: 20 }}>
+          <h2 style={{ fontSize: 16, marginBottom: 12 }}>Rekomendasi Bacaan</h2>
+          <ul className="rec-list">
+            {recs.map((r) => (
+              <li key={r.slug}>
+                <Link href={`/katalog/${r.slug}`}>{r.title}</Link>
+                <span className="rec-meta">
+                  {[r.authors.join(', '), r.year, r.category]
+                    .filter(Boolean)
+                    .join(' · ')}
+                </span>
+                <span className="rec-basis">{BASIS_HINT[r.basis] ?? ''}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }
