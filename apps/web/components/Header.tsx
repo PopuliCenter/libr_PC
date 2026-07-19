@@ -19,6 +19,7 @@ export default function Header() {
         </Link>
         <nav className="nav">
           <Link href="/">{t('catalog')}</Link>
+          <Link href="/tanya">{t('ask')}</Link>
           <Link href="/dampak">{t('impact')}</Link>
           {user ? (
             <>

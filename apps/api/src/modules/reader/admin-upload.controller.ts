@@ -7,9 +7,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Audited } from '../../common/decorators/audited.decorator';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { DocumentsService } from '../catalog/documents.service';
+import { DOCUMENT_DIGITIZED } from '../notifications/events';
 import { StorageService } from '../storage/storage.service';
 import { PdfRenderService } from './pdf-render.service';
 
@@ -23,6 +25,7 @@ export class AdminUploadController {
     private readonly documentsService: DocumentsService,
     private readonly storage: StorageService,
     private readonly renderService: PdfRenderService,
+    private readonly events: EventEmitter2,
   ) {}
 
   @Audited('document.upload-pdf', 'document')
@@ -55,6 +58,9 @@ export class AdminUploadController {
       key,
       pageCount,
     );
+
+    // Picu pengindeksan RAG (PRD P2) di latar belakang.
+    this.events.emit(DOCUMENT_DIGITIZED, { documentId: doc.id });
 
     return {
       id: updated.id,

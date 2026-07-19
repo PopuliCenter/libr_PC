@@ -8,6 +8,7 @@ export const LOAN_EXPIRING = 'loan.expiring';
 export const LOAN_RELEASED = 'loan.released';
 export const HOLD_OFFERED = 'hold.offered';
 export const DOCUMENT_PUBLISHED = 'document.published';
+export const DOCUMENT_DIGITIZED = 'document.digitized';
 
 export class LoanCreatedEvent {
   constructor(

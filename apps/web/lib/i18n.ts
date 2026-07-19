@@ -10,6 +10,29 @@ export const DICT: Record<string, Record<Lang, string>> = {
   // Header
   catalog: { id: 'Katalog', en: 'Catalog' },
   impact: { id: 'Dampak', en: 'Impact' },
+  ask: { id: 'Tanya', en: 'Ask' },
+  askTitle: { id: 'Tanya Koleksi', en: 'Ask the Collections' },
+  askSub: {
+    id: 'Ajukan pertanyaan; jawaban dirujuk ke halaman koleksi yang relevan.',
+    en: 'Ask a question; answers are grounded in cited collection pages.',
+  },
+  askPlaceholder: {
+    id: 'mis. Apa temuan Populi soal partisipasi pemilih muda?',
+    en: 'e.g. What are Populi’s findings on youth voter participation?',
+  },
+  askBtn: { id: 'Tanya', en: 'Ask' },
+  askThinking: { id: 'Mencari di koleksi…', en: 'Searching collections…' },
+  askSources: { id: 'Sumber', en: 'Sources' },
+  askPage: { id: 'hal.', en: 'p.' },
+  askExtractive: {
+    id: 'Cuplikan langsung dari koleksi (sintesis AI nonaktif).',
+    en: 'Direct excerpts from the collections (AI synthesis disabled).',
+  },
+  askLoginNote: {
+    id: 'Masuk untuk bertanya ke koleksi.',
+    en: 'Sign in to ask the collections.',
+  },
+  openReader: { id: 'Buka di pembaca', en: 'Open in reader' },
   signin: { id: 'Masuk', en: 'Sign in' },
   register: { id: 'Daftar', en: 'Register' },
   logout: { id: 'Keluar', en: 'Sign out' },

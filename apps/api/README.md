@@ -71,6 +71,25 @@ src/
 | `GET /widget.js` · `GET /widget/publications` | publik | Widget tersemat untuk populicenter.org (skrip loader + data JSON ber-CORS) |
 | `GET /oai?verb=Identify` dll. | publik | OAI-PMH: Identify, ListMetadataFormats, ListIdentifiers, ListRecords, GetRecord (oai_dc) |
 | `POST /chat/messages` | publik (rate-limited) | Chat bantuan; `GET /chat/sessions/:id/messages` untuk riwayat |
+| `POST /rag/ask` | member (rate-limited) | Tanya-jawab koleksi (RAG, PRD P2): jawaban ber-rujukan halaman dari teks koleksi; INTERNAL dikecualikan |
+| `POST /admin/documents/:id/reindex` | librarian+ | Bangun ulang indeks teks RAG sebuah koleksi (auto-index juga berjalan saat upload PDF) |
+
+## Tanya-jawab koleksi (RAG — PRD P2)
+
+`POST /rag/ask` menjawab pertanyaan berdasarkan **teks koleksi** dengan rujukan
+halaman (ditautkan ke protected reader):
+
+- **Indeks teks**: saat PDF master diunggah, teks per halaman diekstrak (MuPDF)
+  dan disimpan sebagai potongan (`document_chunks`). Auto-index via event; ulang
+  via `POST /admin/documents/:id/reindex`.
+- **Retrieval**: skor leksikal (BM25-lite) portabel; koleksi **INTERNAL tak pernah
+  diambil** (konsisten P1). Dirancang agar retriever embedding bisa menggantikan.
+- **Jawaban**: bila `ANTHROPIC_API_KEY` ada → disintesis Claude, *grounded* ke
+  kutipan & wajib merujuk `[n]`; bila tidak → **mode ekstraktif** (kutipan langsung).
+  Halaman `/tanya` menampilkan jawaban + daftar sumber (judul, halaman, tautan reader).
+
+> Catatan: ekstraksi mengandalkan lapisan teks PDF (born-digital). PDF hasil scan
+> tanpa OCR belum menghasilkan teks — tambahkan OCR (mis. Tesseract) sebagai lanjutan.
 
 ## Chat AI
 

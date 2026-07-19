@@ -141,6 +141,20 @@ export interface Annotation {
   updatedAt: string;
 }
 
+export interface RagCitation {
+  n: number;
+  title: string;
+  slug: string;
+  pageNo: number;
+  snippet: string;
+}
+
+export interface RagAnswer {
+  mode: 'ai' | 'extractive' | 'none';
+  answer: string;
+  citations: RagCitation[];
+}
+
 export interface Recommendation {
   title: string;
   slug: string;
