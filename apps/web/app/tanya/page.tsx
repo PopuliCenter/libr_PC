@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useAuth } from '../../components/AuthContext';
 import { useLang } from '../../components/LanguageContext';
+import Icon from '../../components/Icon';
 import { api, RagAnswer } from '../../lib/api';
 
 export default function AskPage() {
@@ -43,7 +44,7 @@ export default function AskPage() {
   return (
     <div className="container page">
       <h1 className="page-title">{t('askTitle')}</h1>
-      <p className="page-sub" style={{ maxWidth: 640 }}>{t('askSub')}</p>
+      <p className="page-sub">{t('askSub')}</p>
 
       <form className="searchbar" onSubmit={submit}>
         <input
@@ -53,7 +54,7 @@ export default function AskPage() {
           onChange={(e) => setQuestion(e.target.value)}
         />
         <button className="btn" type="submit" disabled={busy}>
-          {busy ? t('askThinking') : t('askBtn')}
+          <Icon name={busy ? 'spark' : 'search'} /> {busy ? t('askThinking') : t('askBtn')}
         </button>
       </form>
 
@@ -61,7 +62,7 @@ export default function AskPage() {
 
       {result && (
         <>
-          <div className="card" style={{ marginBottom: 18 }}>
+          <div className="card section-block">
             <p className="rag-answer">{result.answer}</p>
             {result.mode === 'extractive' && (
               <p className="rag-note">{t('askExtractive')}</p>
@@ -70,7 +71,7 @@ export default function AskPage() {
 
           {result.citations.length > 0 && (
             <>
-              <h2 style={{ fontSize: 16, marginBottom: 12 }}>{t('askSources')}</h2>
+              <h2 className="section-title">{t('askSources')}</h2>
               <div className="rag-cites">
                 {result.citations.map((c) => (
                   <div key={c.n} className="rag-cite">
@@ -81,7 +82,7 @@ export default function AskPage() {
                     </div>
                     <p className="rag-cite-snippet">{c.snippet}</p>
                     <Link className="rag-cite-open" href={`/baca/${c.slug}`}>
-                      {t('openReader')} →
+                      {t('openReader')} <Icon name="arrow-right" />
                     </Link>
                   </div>
                 ))}

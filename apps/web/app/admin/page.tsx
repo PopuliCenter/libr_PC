@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../components/AuthContext';
+import Icon from '../../components/Icon';
 import { api, DocumentItem, PagedResult } from '../../lib/api';
 
 const EMPTY_FORM = {
@@ -114,25 +115,33 @@ export default function AdminPage() {
 
   return (
     <div className="container page">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+      <div className="page-head">
         <div>
           <h1 className="page-title">Manajemen Koleksi</h1>
           <p className="page-sub">Tambah dan kelola koleksi perpustakaan.</p>
         </div>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div className="toolbar">
           {user?.role === 'superadmin' && (
-            <Link href="/admin/pengguna" className="btn secondary">👤 Pengguna</Link>
+            <Link href="/admin/pengguna" className="btn secondary">
+              <Icon name="users" /> Pengguna
+            </Link>
           )}
-          <Link href="/admin/analitik" className="btn secondary">📈 Analitik</Link>
-          <Link href="/admin/inventaris" className="btn secondary">📷 Inventaris Fisik</Link>
-          <Link href="/admin/impor" className="btn">📦 Impor Massal</Link>
+          <Link href="/admin/analitik" className="btn secondary">
+            <Icon name="chart" /> Analitik
+          </Link>
+          <Link href="/admin/inventaris" className="btn secondary">
+            <Icon name="camera" /> Inventaris Fisik
+          </Link>
+          <Link href="/admin/impor" className="btn">
+            <Icon name="package" /> Impor Massal
+          </Link>
         </div>
       </div>
 
       {notice && <div className={`alert ${notice.kind}`}>{notice.text}</div>}
 
-      <div className="card" style={{ marginBottom: 28 }}>
-        <h2 style={{ fontSize: 16, marginBottom: 14 }}>Tambah Koleksi</h2>
+      <div className="card section-block">
+        <h2 className="section-title">Tambah Koleksi</h2>
         <form onSubmit={submit}>
           <div className="field">
             <label>Judul</label>
@@ -257,7 +266,7 @@ export default function AdminPage() {
                   onChange={(e) => setLinks(links.map((x, j) => (j === i ? { ...x, url: e.target.value } : x)))}
                 />
                 <button type="button" className="btn danger" style={{ padding: '4px 10px' }}
-                  onClick={() => setLinks(links.filter((_, j) => j !== i))}>✕</button>
+                  onClick={() => setLinks(links.filter((_, j) => j !== i))} aria-label="Hapus tautan"><Icon name="close" /></button>
               </div>
             ))}
             <button type="button" className="btn secondary" style={{ padding: '6px 14px', fontSize: 13 }}
@@ -273,9 +282,7 @@ export default function AdminPage() {
       </div>
 
       <div className="card">
-        <h2 style={{ fontSize: 16, marginBottom: 14 }}>
-          Semua Koleksi ({docs.length})
-        </h2>
+        <h2 className="section-title">Semua Koleksi ({docs.length})</h2>
         <div style={{ overflowX: 'auto' }}>
           <table className="admin-table">
             <thead>

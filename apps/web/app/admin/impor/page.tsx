@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../../components/AuthContext';
+import Icon from '../../../components/Icon';
 import {
   api,
   apiDownload,
@@ -122,7 +123,7 @@ export default function ImportPage() {
             Unggah satu ZIP berisi template terisi (.xlsx) + berkas PDF.
           </p>
         </div>
-        <Link href="/admin" className="btn secondary">← Kelola Koleksi</Link>
+        <Link href="/admin" className="btn secondary"><Icon name="left" /> Kelola Koleksi</Link>
       </div>
 
       {error && <div className="alert error">{error}</div>}
@@ -136,7 +137,7 @@ export default function ImportPage() {
             apiDownload('/admin/import/template', 'template-impor-populi.xlsx')
           }
         >
-          ⬇ Unduh Template Excel
+          <Icon name="download" /> Unduh Template Excel
         </button>
         <p className="page-sub" style={{ margin: '14px 0 8px' }}>
           Isi sheet “Koleksi”, kumpulkan dengan PDF ke dalam satu ZIP, lalu
@@ -269,7 +270,7 @@ export default function ImportPage() {
                   )
                 }
               >
-                ⬇ Unduh Laporan
+                <Icon name="download" /> Unduh Laporan
               </button>
             </div>
           )}

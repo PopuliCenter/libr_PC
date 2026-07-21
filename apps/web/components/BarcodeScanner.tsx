@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Icon from './Icon';
 
 /**
  * Pemindai barcode kamera memakai BarcodeDetector API (Chromium/Android).
@@ -71,7 +72,7 @@ export default function BarcodeScanner({
       <div className="scanner-box" onClick={(e) => e.stopPropagation()}>
         <div className="scanner-head">
           <span>Arahkan kamera ke barcode</span>
-          <button onClick={onClose} aria-label="Tutup">✕</button>
+          <button onClick={onClose} aria-label="Tutup"><Icon name="close" /></button>
         </div>
         {supported ? (
           <>

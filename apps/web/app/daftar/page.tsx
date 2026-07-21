@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import InterestPicker from '../../components/InterestPicker';
 import { api } from '../../lib/api';
+import Icon from '../../components/Icon';
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -46,7 +47,7 @@ export default function RegisterPage() {
             <strong>{form.email}</strong>. Klik tautan tersebut untuk
             mengaktifkan akun Anda.
           </div>
-          <Link href="/masuk">← Ke halaman masuk</Link>
+          <Link href="/masuk"><Icon name="left" /> Ke halaman masuk</Link>
         </div>
       </div>
     );

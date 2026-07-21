@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { api } from '../lib/api';
+import Icon from './Icon';
 
 interface Msg {
   role: 'user' | 'assistant';
@@ -58,7 +59,7 @@ export default function ChatWidget() {
         <div className="chat-panel" role="dialog" aria-label="Chat bantuan">
           <div className="chat-head">
             <span>Bantuan Perpustakaan</span>
-            <button onClick={() => setOpen(false)} aria-label="Tutup">✕</button>
+            <button onClick={() => setOpen(false)} aria-label="Tutup"><Icon name="close" /></button>
           </div>
           <div className="chat-body" ref={bodyRef}>
             {messages.map((m, i) => (
@@ -85,7 +86,7 @@ export default function ChatWidget() {
         onClick={() => setOpen((v) => !v)}
         aria-label="Buka chat bantuan"
       >
-        💬
+        <Icon name={open ? 'close' : 'chat'} size={20} />
       </button>
     </>
   );

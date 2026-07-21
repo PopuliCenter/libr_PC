@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../../components/AuthContext';
 import { useLang } from '../../../components/LanguageContext';
 import CiteBox from '../../../components/CiteBox';
+import Icon from '../../../components/Icon';
 import RelatedMedia from '../../../components/RelatedMedia';
 import { api, Availability, DocumentItem, Recommendation } from '../../../lib/api';
 import { docAbstract, docTitle } from '../../../lib/i18n';
@@ -106,10 +107,10 @@ export default function DocumentDetailClient({
   return (
     <div className="container page">
       <div className="detail-head">
-        <div>
+        <div className="detail-badges">
           <span className={`badge ${doc.accessType.toLowerCase()}`}>
             {t(doc.accessType)}
-          </span>{' '}
+          </span>
           <span className="badge type">{doc.collectionType}</span>
         </div>
         <h1 className="page-title">{docTitle(doc, lang)}</h1>
@@ -121,25 +122,27 @@ export default function DocumentDetailClient({
 
       {notice && <div className={`alert ${notice.kind}`}>{notice.text}</div>}
 
-      <div className="card" style={{ marginBottom: 20 }}>
-        <div className="alert info" style={{ marginBottom: 16 }}>
+      <div className="card section-block">
+        <div className="alert info">
           {isMultimedia ? t('multimediaNote') : t(`accessInfo_${doc.accessType}`)}
           {!isMultimedia && !doc.hasDigitalCopy && t('digitalUnavailable')}
         </div>
 
-        <div
-          style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}
-        >
+        <div className="action-row">
           {doc.hasDigitalCopy && !user && (
             <Link className="btn" href="/masuk">{t('signinToRead')}</Link>
           )}
 
           {doc.hasDigitalCopy && user && doc.accessType !== 'LOAN' && (
-            <Link className="btn" href={`/baca/${doc.slug}`}>{t('readOnline')}</Link>
+            <Link className="btn" href={`/baca/${doc.slug}`}>
+              <Icon name="book" /> {t('readOnline')}
+            </Link>
           )}
 
           {doc.hasDigitalCopy && user && doc.accessType === 'LOAN' && isStaff && (
-            <Link className="btn" href={`/baca/${doc.slug}`}>{t('readOnline')}</Link>
+            <Link className="btn" href={`/baca/${doc.slug}`}>
+              <Icon name="book" /> {t('readOnline')}
+            </Link>
           )}
 
           <CiteBox doc={doc} />
@@ -147,7 +150,7 @@ export default function DocumentDetailClient({
 
         {doc.hasDigitalCopy && user && doc.accessType === 'LOAN' && !isStaff &&
           avail && (
-            <div style={{ marginTop: 14 }}>
+            <div className="loan-actions">
               <LoanActions
                 avail={avail}
                 slug={doc.slug}
@@ -192,14 +195,14 @@ export default function DocumentDetailClient({
       <RelatedMedia links={doc.relatedLinks} />
 
       {docAbstract(doc, lang) && (
-        <section className="card" style={{ marginBottom: 20 }}>
-          <h2 style={{ fontSize: 16, marginBottom: 8 }}>{t('abstract')}</h2>
-          <p style={{ fontSize: 14 }}>{docAbstract(doc, lang)}</p>
+        <section className="card section-block">
+          <h2 className="section-title">{t('abstract')}</h2>
+          <p className="prose">{docAbstract(doc, lang)}</p>
         </section>
       )}
 
       <section className="card">
-        <h2 style={{ fontSize: 16, marginBottom: 12 }}>{t('details')}</h2>
+        <h2 className="section-title">{t('details')}</h2>
         <dl className="detail-meta">
           <dt>{t('author')}</dt>
           <dd>{doc.authors.join('; ')}</dd>
@@ -239,8 +242,8 @@ export default function DocumentDetailClient({
       </section>
 
       {recs.length > 0 && (
-        <section className="card" style={{ marginTop: 20 }}>
-          <h2 style={{ fontSize: 16, marginBottom: 12 }}>{t('recommendations')}</h2>
+        <section className="card section-block-top">
+          <h2 className="section-title">{t('recommendations')}</h2>
           <ul className="rec-list">
             {recs.map((r) => (
               <li key={r.slug}>
@@ -305,7 +308,7 @@ function LoanActions({
   if (avail.myLoan) {
     return (
       <div style={row}>
-        <Link className="btn" href={`/baca/${slug}`}>📖 Baca Online</Link>
+        <Link className="btn" href={`/baca/${slug}`}><Icon name="book" /> Baca Online</Link>
         <button className="btn secondary" onClick={() => onReturn(avail.myLoan!.id)} disabled={busy}>
           Kembalikan
         </button>
@@ -321,7 +324,7 @@ function LoanActions({
     return (
       <div>
         <div className="alert success" style={{ marginBottom: 12 }}>
-          🎉 Giliran Anda tiba! Klaim sebelum{' '}
+          Giliran Anda tiba! Klaim sebelum{' '}
           {avail.myHold.offerExpiresAt &&
             new Date(avail.myHold.offerExpiresAt).toLocaleString('id-ID')}
           , setelah itu giliran berpindah.

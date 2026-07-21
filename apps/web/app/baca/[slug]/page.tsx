@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../../components/AuthContext';
 import ReaderNotes from '../../../components/ReaderNotes';
+import Icon from '../../../components/Icon';
 import {
   api,
   apiBlob,
@@ -125,7 +126,7 @@ export default function ReaderPage() {
     >
       <div className="reader-bar">
         <Link href={`/katalog/${slug}`} className="reader-close">
-          ✕ Tutup
+          <Icon name="close" /> Tutup
         </Link>
         <span className="reader-title">{session?.title ?? 'Memuat…'}</span>
         {session && (
@@ -133,11 +134,11 @@ export default function ReaderPage() {
             className="reader-notes-toggle"
             onClick={() => setShowNotes((s) => !s)}
           >
-            📝 Catatan
+            <Icon name="note" /> Catatan
           </button>
         )}
         <div className="reader-nav">
-          <button onClick={() => go(-1)} disabled={page <= 1}>‹</button>
+          <button onClick={() => go(-1)} disabled={page <= 1} aria-label="Halaman sebelumnya"><Icon name="left" /></button>
           <span>
             {page}
             {session?.pageCount ? ` / ${session.pageCount}` : ''}
@@ -146,7 +147,7 @@ export default function ReaderPage() {
             onClick={() => go(1)}
             disabled={!!session?.pageCount && page >= session.pageCount}
           >
-            ›
+            <Icon name="right" />
           </button>
         </div>
       </div>

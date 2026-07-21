@@ -1,7 +1,8 @@
 'use client';
 
 import { RelatedLink } from '../lib/api';
-import { LINK_KIND_LABEL, toEmbed } from '../lib/embed';
+import { LINK_KIND_ICON, LINK_KIND_LABEL, toEmbed } from '../lib/embed';
+import Icon, { IconName } from './Icon';
 import { useLang } from './LanguageContext';
 
 /**
@@ -17,13 +18,15 @@ export default function RelatedMedia({ links }: { links: RelatedLink[] }) {
     .filter((x) => x.embed);
 
   return (
-    <section className="card" style={{ marginBottom: 20 }}>
-      <h2 style={{ fontSize: 16, marginBottom: 12 }}>{t('relatedMedia')}</h2>
+    <section className="card section-block">
+      <h2 className="section-title">{t('relatedMedia')}</h2>
 
       {embeds.map(({ link, embed }) => (
-        <div key={link.url} style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
-            {embed!.provider === 'YouTube' ? '🎬' : '🎧'} {link.title}
+        <div key={link.url} className="embed-block">
+          <div className="embed-caption">
+            <Icon name={embed!.kind === 'video' ? 'play' : 'audio'} />
+            {link.title}
+            <span className="embed-provider">{embed!.provider}</span>
           </div>
           <div className={`embed-frame ${embed!.kind}`}>
             <iframe
@@ -42,8 +45,9 @@ export default function RelatedMedia({ links }: { links: RelatedLink[] }) {
         {links.map((l) => (
           <li key={l.url}>
             <a href={l.url} target="_blank" rel="noopener noreferrer">
-              <span className="lk-kind">{LINK_KIND_LABEL[l.kind] ?? '🔗'}</span>
+              <Icon name={(LINK_KIND_ICON[l.kind] ?? 'link') as IconName} />
               {l.title}
+              <span className="lk-kind">{LINK_KIND_LABEL[l.kind] ?? 'Tautan'}</span>
             </a>
           </li>
         ))}

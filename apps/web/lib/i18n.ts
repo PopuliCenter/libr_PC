@@ -76,8 +76,8 @@ export const DICT: Record<string, Record<Lang, string>> = {
   physicalCopies: { id: 'Eksemplar fisik', en: 'Physical copies' },
   digitalOnly: { id: 'Hanya digital', en: 'Digital only' },
   physicalAt: { id: 'eksemplar di perpustakaan', en: 'copies at the library' },
-  cite: { id: '❝ Kutip', en: '❝ Cite' },
-  readOnline: { id: '📖 Baca Online', en: '📖 Read Online' },
+  cite: { id: 'Kutip', en: 'Cite' },
+  readOnline: { id: 'Baca Online', en: 'Read Online' },
   signinToRead: { id: 'Masuk untuk membaca', en: 'Sign in to read' },
   // Access info sentences
   accessInfo_OPEN: {

@@ -34,7 +34,7 @@ export default async function ImpactPage() {
   return (
     <div className="container page">
       <h1 className="page-title">Dampak & Akuntabilitas</h1>
-      <p className="page-sub" style={{ maxWidth: 640 }}>
+      <p className="page-sub">
         Perpustakaan Digital Populi Center menjadikan riset kami dapat diakses luas.
         Angka berikut kami buka sebagai bentuk akuntabilitas diseminasi pengetahuan
         kepada publik, mitra, dan pendukung.
@@ -55,7 +55,7 @@ export default async function ImpactPage() {
 
           {data.topPublic.length > 0 && (
             <section className="card">
-              <h2 style={{ fontSize: 16, marginBottom: 12 }}>Publikasi Paling Dibaca</h2>
+              <h2 className="section-title">Publikasi Paling Dibaca</h2>
               <ol className="impact-top">
                 {data.topPublic.map((d) => (
                   <li key={d.slug}>
@@ -69,7 +69,7 @@ export default async function ImpactPage() {
             </section>
           )}
 
-          <p style={{ fontSize: 12, color: 'var(--ink-soft)', marginTop: 20 }}>
+          <p className="page-note">
             Angka pembacaan dihitung dari sesi baca daring koleksi publik; koleksi
             internal tidak disertakan. Diperbarui berkala.
           </p>

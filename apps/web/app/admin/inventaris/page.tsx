@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import BarcodeScanner from '../../../components/BarcodeScanner';
 import { useAuth } from '../../../components/AuthContext';
+import Icon from '../../../components/Icon';
 import {
   api,
   apiDownload,
@@ -36,14 +37,14 @@ export default function InventoryPage() {
     <div className="container page">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
         <h1 className="page-title">Inventarisasi Fisik</h1>
-        <Link href="/admin" className="btn secondary">← Kelola Koleksi</Link>
+        <Link href="/admin" className="btn secondary"><Icon name="left" /> Kelola Koleksi</Link>
       </div>
       <div className="inv-tabs">
         <button className={mode === 'pendataan' ? 'active' : ''} onClick={() => setMode('pendataan')}>
-          📷 Pendataan
+          Pendataan
         </button>
         <button className={mode === 'opname' ? 'active' : ''} onClick={() => setMode('opname')}>
-          ✅ Stock Opname
+          Stock Opname
         </button>
       </div>
       {mode === 'pendataan' ? <Pendataan /> : <Opname />}
@@ -180,7 +181,7 @@ function Pendataan() {
               placeholder="mis. 9780140328721"
             />
           </div>
-          <button className="btn secondary" onClick={() => setScanning(true)}>📷 Scan Kamera</button>
+          <button className="btn secondary" onClick={() => setScanning(true)}><Icon name="camera" /> Scan Kamera</button>
           <button className="btn secondary" onClick={() => form.isbn.trim() && lookup(form.isbn.trim())}>Cari</button>
         </div>
 
@@ -218,10 +219,10 @@ function Pendataan() {
           <h2 style={{ fontSize: 16 }}>Eksemplar Terbaru</h2>
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="btn secondary" onClick={printLabels} disabled={selected.size === 0}>
-              🏷 Cetak Label QR ({selected.size})
+              <Icon name="tag" /> Cetak Label QR ({selected.size})
             </button>
             <button className="btn secondary" onClick={() => apiDownload('/admin/inventory/report', 'rekap-inventaris.xlsx')}>
-              ⬇ Rekap
+              <Icon name="download" /> Rekap
             </button>
           </div>
         </div>
@@ -280,7 +281,7 @@ function Opname() {
           clientScanId: crypto.randomUUID(),
         },
       );
-      setNotice(r.recognized ? `✓ ${r.accessionNo} — ${r.title}` : `⚠ Barcode tak dikenal: ${code}`);
+      setNotice(r.recognized ? `${r.accessionNo} — ${r.title}` : `Barcode tak dikenal: ${code}`);
       setDetail(await api.get<StocktakeDetail>(`/admin/stocktakes/${detail.stocktake.id}`));
     } catch (err) {
       setNotice((err as Error).message);
@@ -331,7 +332,7 @@ function Opname() {
             <button className="btn danger" onClick={close}>Tutup Sesi</button>
           ) : (
             <button className="btn secondary" onClick={() => apiDownload(`/admin/stocktakes/${detail.stocktake.id}/report`, 'laporan-opname.xlsx')}>
-              ⬇ Unduh Laporan
+              <Icon name="download" /> Unduh Laporan
             </button>
           )}
         </div>
@@ -353,7 +354,7 @@ function Opname() {
               onChange={(e) => setBarcode(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') scan(barcode); }}
             />
-            <button className="btn secondary" onClick={() => setScanning(true)}>📷 Kamera</button>
+            <button className="btn secondary" onClick={() => setScanning(true)}><Icon name="camera" /> Kamera</button>
           </div>
         )}
         {notice && <div className="alert info" style={{ marginTop: 4 }}>{notice}</div>}
@@ -373,7 +374,7 @@ function Opname() {
               {detail.recentScans.map((sc) => (
                 <tr key={sc.id}>
                   <td>{sc.barcode}</td>
-                  <td>{sc.physicalItemId ? '✓ dikenali' : '⚠ tak dikenal'}</td>
+                  <td>{sc.physicalItemId ? <span className="badge open">dikenali</span> : <span className="badge loan">tak dikenal</span>}</td>
                 </tr>
               ))}
               {detail.recentScans.length === 0 && (

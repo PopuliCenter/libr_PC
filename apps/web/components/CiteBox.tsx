@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { buildCitations, CitableDoc } from '../lib/citations';
+import Icon from './Icon';
 import { useLang } from './LanguageContext';
 
 /**
@@ -30,7 +31,7 @@ export default function CiteBox({ doc }: { doc: CitableDoc }) {
   if (!open) {
     return (
       <button className="btn secondary" onClick={() => setOpen(true)}>
-        {t('cite')}
+        <Icon name="quote" /> {t('cite')}
       </button>
     );
   }
@@ -51,12 +52,12 @@ export default function CiteBox({ doc }: { doc: CitableDoc }) {
           </button>
         ))}
         <button className="cite-close" onClick={() => setOpen(false)} aria-label="Tutup">
-          ✕
+          <Icon name="close" />
         </button>
       </div>
       <pre className="cite-text">{current.text}</pre>
       <button className="btn" onClick={copy}>
-        {copied ? '✓ Tersalin' : 'Salin'}
+        {copied ? <><Icon name="check" /> Tersalin</> : 'Salin'}
       </button>
     </div>
   );

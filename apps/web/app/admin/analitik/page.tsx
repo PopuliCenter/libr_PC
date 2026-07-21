@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../../components/AuthContext';
+import Icon from '../../../components/Icon';
 import { AnalyticsDashboard, api, apiDownload } from '../../../lib/api';
 
 const RANGES: { label: string; days: number }[] = [
@@ -62,13 +63,13 @@ export default function AnalyticsPage() {
 
   return (
     <div className="container page">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+      <div className="page-head">
         <div>
           <h1 className="page-title">Analitik Diseminasi</h1>
           <p className="page-sub">Seberapa jauh publikasi Populi menjangkau pembaca.</p>
         </div>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-          <div className="inv-tabs" style={{ margin: 0 }}>
+        <div className="toolbar" style={{ alignItems: 'center' }}>
+          <div className="inv-tabs" style={{ marginBottom: 0 }}>
             {RANGES.map((r) => (
               <button
                 key={r.days}
@@ -83,7 +84,7 @@ export default function AnalyticsPage() {
             className="btn secondary"
             onClick={() => apiDownload(`/admin/analytics/report.xlsx?days=${days}`, 'laporan-diseminasi.xlsx')}
           >
-            ⬇ Unduh Laporan
+            <Icon name="download" /> Unduh Laporan
           </button>
         </div>
       </div>
@@ -101,8 +102,8 @@ export default function AnalyticsPage() {
             ))}
           </div>
 
-          <section className="card" style={{ marginBottom: 20 }}>
-            <h2 style={{ fontSize: 16, marginBottom: 12 }}>Tren Pembacaan</h2>
+          <section className="card section-block">
+            <h2 className="section-title">Tren Pembacaan</h2>
             <div className="trend-chart">
               {data.trend.map((t) => (
                 <div key={t.bucket} className="trend-col" title={`${t.bucket}: ${t.reads}`}>
@@ -113,14 +114,14 @@ export default function AnalyticsPage() {
                 </div>
               ))}
             </div>
-            <div style={{ fontSize: 12, color: 'var(--ink-soft)', marginTop: 6 }}>
+            <div className="page-note" style={{ marginTop: 6 }}>
               {data.trend[0]?.bucket} → {data.trend[data.trend.length - 1]?.bucket}
             </div>
           </section>
 
-          <section className="card" style={{ marginBottom: 20 }}>
-            <h2 style={{ fontSize: 16, marginBottom: 12 }}>Publikasi Paling Dibaca</h2>
-            <div style={{ overflowX: 'auto' }}>
+          <section className="card section-block">
+            <h2 className="section-title">Publikasi Paling Dibaca</h2>
+            <div className="table-scroll">
               <table className="admin-table">
                 <thead>
                   <tr><th>#</th><th>Judul</th><th>Kategori</th><th>Dibaca</th><th>Dipinjam</th></tr>
@@ -145,11 +146,11 @@ export default function AnalyticsPage() {
 
           <div className="analytics-cols">
             <section className="card">
-              <h2 style={{ fontSize: 16, marginBottom: 12 }}>Per Institusi (segmen)</h2>
+              <h2 className="section-title">Per Institusi (segmen)</h2>
               <BarList rows={data.byInstitution} max={maxInst} />
             </section>
             <section className="card">
-              <h2 style={{ fontSize: 16, marginBottom: 12 }}>Per Topik</h2>
+              <h2 className="section-title">Per Topik</h2>
               <BarList rows={data.byCategory} max={maxCat} />
             </section>
           </div>

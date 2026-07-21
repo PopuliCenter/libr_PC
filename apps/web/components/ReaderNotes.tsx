@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Annotation, api } from '../lib/api';
+import Icon from './Icon';
 
 /**
  * Panel catatan pribadi di protected reader (PRD P5). Catatan tersimpan per akun
@@ -78,7 +79,7 @@ export default function ReaderNotes({
     <aside className="reader-notes">
       <div className="reader-notes-head">
         <span>Catatan Saya ({notes.length})</span>
-        <button onClick={onClose} aria-label="Tutup catatan">✕</button>
+        <button onClick={onClose} aria-label="Tutup catatan"><Icon name="close" /></button>
       </div>
 
       <div className="reader-notes-add">

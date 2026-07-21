@@ -62,11 +62,22 @@ export function toEmbed(rawUrl: string): Embed | null {
 }
 
 export const LINK_KIND_LABEL: Record<string, string> = {
-  video: '🎬 Video',
-  podcast: '🎙️ Podcast',
-  news: '📰 Berita',
-  slides: '📊 Materi',
-  dataset: '📁 Dataset',
-  event: '📅 Acara',
-  other: '🔗 Tautan',
+  video: 'Video',
+  podcast: 'Podcast',
+  news: 'Berita',
+  slides: 'Materi',
+  dataset: 'Dataset',
+  event: 'Acara',
+  other: 'Tautan',
+};
+
+/** Ikon yang mewakili tiap jenis tautan (lihat components/Icon). */
+export const LINK_KIND_ICON: Record<string, string> = {
+  video: 'play',
+  podcast: 'audio',
+  news: 'news',
+  slides: 'slides',
+  dataset: 'dataset',
+  event: 'calendar',
+  other: 'link',
 };
