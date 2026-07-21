@@ -4,7 +4,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import {
   DOCUMENT_PUBLISHED,
+  DOCUMENT_REMOVED,
   DocumentPublishedEvent,
+  DocumentRemovedEvent,
 } from '../notifications/events';
 import { CreateDocumentDto } from './dto/create-document.dto';
 import { QueryDocumentsDto } from './dto/query-documents.dto';
@@ -192,7 +194,15 @@ export class DocumentsService {
 
   async remove(id: string): Promise<void> {
     const doc = await this.findById(id);
+    const files = new DocumentRemovedEvent(
+      doc.id,
+      doc.masterObjectKey ?? null,
+      doc.coverObjectKey ?? null,
+    );
     await this.repo.remove(doc);
+    // Dipancarkan setelah baris benar-benar terhapus agar berkas tidak
+    // ikut dibuang bila penghapusan basis data gagal.
+    this.events.emit(DOCUMENT_REMOVED, files);
   }
 
   /** Dipakai OAI-PMH: koleksi PUBLISHED terurut berdasarkan waktu ubah. */

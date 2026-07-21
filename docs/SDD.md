@@ -344,6 +344,35 @@ Konvensi: JSON, error format RFC 7807, paginasi `page/per_page`, rate limit per-
 - Estimasi storage: PDF master ~10 MB + render ~150 KB × 200 hal ≈ 40 MB/judul → 1.000 judul ≈ 40–50 GB. MinIO di VPS dengan block storage cukup.
 - Target: p95 render endpoint < 300 ms (di luar network), 200 pembaca konkuren pada 2 vCPU/4 GB per replika API.
 
+### 6.1 Penyimpanan bertingkat (tiering)
+
+`StorageService` merutekan objek ke dua root berdasarkan prefix, karena kedua
+jenis data punya sifat yang berlawanan:
+
+| Prefix | Sifat | Lokasi | Env |
+|---|---|---|---|
+| `masters/`, `imports/` | Besar, jarang dibaca, **wajib awet** | NAS/QNAP (mount) atau disk lokal | `STORAGE_COLD_DIR` |
+| `pages/` | Kecil, **sering dibaca**, selalu bisa dibuat ulang | **Selalu disk lokal** | `STORAGE_DIR` |
+
+Cache halaman sengaja tidak pernah dipindah ke jaringan: membalik halaman
+adalah operasi terpanas di aplikasi, dan pola aksesnya (banyak berkas kecil,
+acak) adalah yang terburuk untuk NFS/SMB. Sebaliknya master berukuran puluhan
+MB hanya dibaca saat render pertama dan saat pengindeksan RAG.
+
+Bila `STORAGE_COLD_DIR` kosong, semua objek jatuh ke satu root lokal — sehingga
+pengembangan lokal dan pemasangan sederhana tidak berubah sama sekali.
+
+**Batas cache.** `PageCacheService` menjalankan cron harian yang membuang
+render lebih tua dari `PAGE_CACHE_TTL_DAYS` (default 30; `0` = nonaktif).
+Tanpa ini `pages/` tumbuh tanpa batas — pengukuran nyata: ±18 KB/halaman untuk
+PDF teks, ±240 KB untuk hasil pindai.
+
+**Daur hidup berkas.** Menghapus koleksi memancarkan `document.removed`;
+`DocumentFilesListener` membuang PDF master, sampul, dan cache halamannya.
+Mengganti PDF master juga menghapus cache lama — kunci cache hanya berbasis
+`documentId` + nomor halaman, jadi tanpa itu pembaca akan disuguhi halaman
+dari PDF sebelumnya.
+
 ---
 
 ## 7. Deployment & Operasional
@@ -359,6 +388,13 @@ VPS (mis. 4 vCPU / 8 GB, lokasi Indonesia untuk latensi & residensi data)
     ├── redis
     └── minio (atau ganti S3/R2 terkelola)
 ```
+
+**Alternatif tanpa menambah disk server:** bila tersedia NAS (mis. QNAP),
+arahkan `STORAGE_COLD_DIR` ke titik mount NFS/SMB-nya. PDF master & berkas
+impor — bagian terbesar — pindah ke NAS, sementara disk server hanya menampung
+basis data dan cache halaman yang sudah dibatasi TTL. Untuk S3 sungguhan tanpa
+memakai disk server, jalankan MinIO/QuObjects **di NAS**, bukan di server.
+Catatan: RAID pada NAS bukan cadangan — master tetap perlu salinan terpisah.
 
 - CI/CD: GitHub Actions — lint, test, build image, deploy tag.
 - Observabilitas: log terstruktur (JSON) + uptime monitor; error tracking (Sentry).

@@ -9,6 +9,7 @@ export const LOAN_RELEASED = 'loan.released';
 export const HOLD_OFFERED = 'hold.offered';
 export const DOCUMENT_PUBLISHED = 'document.published';
 export const DOCUMENT_DIGITIZED = 'document.digitized';
+export const DOCUMENT_REMOVED = 'document.removed';
 
 export class LoanCreatedEvent {
   constructor(
@@ -42,6 +43,18 @@ export class HoldOfferedEvent {
     readonly documentTitle: string,
     readonly documentSlug: string,
     readonly offerExpiresAt: Date,
+  ) {}
+}
+
+/**
+ * Koleksi dihapus → berkas terkait (PDF master, cache halaman) ikut dibuang.
+ * Tanpa event ini baris basis data hilang tapi berkasnya jadi yatim di disk.
+ */
+export class DocumentRemovedEvent {
+  constructor(
+    readonly documentId: string,
+    readonly masterObjectKey: string | null,
+    readonly coverObjectKey: string | null,
   ) {}
 }
 

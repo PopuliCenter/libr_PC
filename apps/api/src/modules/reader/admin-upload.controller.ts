@@ -13,6 +13,7 @@ import { Roles } from '../../common/decorators/roles.decorator';
 import { DocumentsService } from '../catalog/documents.service';
 import { DOCUMENT_DIGITIZED } from '../notifications/events';
 import { StorageService } from '../storage/storage.service';
+import { PageCacheService } from './page-cache.service';
 import { PdfRenderService } from './pdf-render.service';
 
 const MAX_PDF_BYTES = 200 * 1024 * 1024;
@@ -25,6 +26,7 @@ export class AdminUploadController {
     private readonly documentsService: DocumentsService,
     private readonly storage: StorageService,
     private readonly renderService: PdfRenderService,
+    private readonly pageCache: PageCacheService,
     private readonly events: EventEmitter2,
   ) {}
 
@@ -53,6 +55,9 @@ export class AdminUploadController {
 
     const key = `masters/${doc.id}.pdf`;
     await this.storage.put(key, file.buffer);
+    // Master diganti → cache halaman lama harus dibuang, kalau tidak pembaca
+    // masih disuguhi halaman dari PDF sebelumnya (kunci cache-nya sama).
+    await this.pageCache.evictDocument(doc.id);
     const updated = await this.documentsService.setDigitalFile(
       doc.id,
       key,
